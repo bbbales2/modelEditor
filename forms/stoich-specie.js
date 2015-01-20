@@ -31,6 +31,7 @@ module.exports = View.extend({
 
         this.renderSubview(
             new ModifyingSelectView({
+                template: '<span><span data-hook="label"></span><select></select><span data-hook="message-container"><span data-hook="message-text"></span></span></span>',
                 label: 'Species',
                 name: 'specie',
                 value: this.model.specie,
@@ -43,6 +44,7 @@ module.exports = View.extend({
 
         this.renderSubview(
             new ModifyingNumberInputView({
+                template: '<span><span data-hook="label"></span><input><span data-hook="message-container"><span data-hook="message-text"></span></span></span>',
                 label: 'Stoichiometry',
                 name: 'stoichiometry',
                 value: this.model.stoichiometry,
@@ -51,6 +53,10 @@ module.exports = View.extend({
                 model : this.model,
                 tests: [].concat(Tests.nonzero(), Tests.integer())
             }), this.el.querySelector("[data-hook='stoichiometry']"));
+        
+        //Hide all the labels!
+        $( this.el ).find('[data-hook="label"]').hide();
+        $( this.el ).find('input, select').css('width', '100px');
         
         return this;
     }

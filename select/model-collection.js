@@ -15,7 +15,7 @@ var AddNewModelForm = AmpersandFormView.extend({
                                 type : 'massaction',
                                 isSpatial : false });
 
-        this.collection.add(model);
+        this.collection.add(model).save();
     },
     validCallback: function (valid) {
         if (valid) {
@@ -56,7 +56,7 @@ var AddNewModelForm = AmpersandFormView.extend({
 });
 
 var ModelCollectionSelectView = AmpersandView.extend({
-    template: "<div><div>Model selector<div><table><thead><th>*</th><th>Name</th><th>Type</th><th>Delete</th></thead><tbody data-hook='modelTable'></tbody></table>Add Model: <form data-hook='addModelForm'></form></div>",
+    template: "<div><h3>Select Model</h3><table class='table table-bordered'><thead><th></th><th>Name</th><th>Type</th><th>Delete</th></thead><tbody data-hook='modelTable'></tbody></table><h3>Add Model</h3><form data-hook='addModelForm'></form></div>",
     props: {
         selected : 'object'
     },

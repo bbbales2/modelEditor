@@ -1,4 +1,4 @@
-(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({"/home/bbales2/modelEditor/app.js":[function(require,module,exports){
+(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({"/home/bbales2/stochssModel/app/lib/modelEditor/app.js":[function(require,module,exports){
 /*global app, me, $*/
 var $ = require('jquery');
 var _ = require('underscore');
@@ -39,36 +39,46 @@ model2.reactions.addMassActionReaction('R2', k2, [[B, 1], [A, 1]], [[B, 5]]);
 model = new Model(model2.toJSON());*/
 
 var PrimaryView = View.extend({
-    template: "<body> \
-<div data-hook='editor'></div> \
-<div data-hook='selector'></div> \
-</body>",
+    template: "<div> \
+<div class='well' data-hook='selector'></div> \
+<div class='well' data-hook='editor'></div> \
+</div>",
     initialize: function(attr, options)
     {
         View.prototype.initialize.call(this, attr, options);
     },
     selectModel: function()
     {
+        if(this.modelSelector.selected)
+        {
+            if(this.modelEditor)
+            {
+                this.modelEditor.remove()
+                this.stopListening(this.modelSelector.selected);
+                
+                delete this.modelEditor;
+            }
+            
+            this.modelEditor = new ModelEditorView( {
+                    el : $( '<div>' ).appendTo( this.queryByHook('editor') )[0],
+                    model : this.modelSelector.selected,
+                    parent : this
+                } )
+            
+            this.listenTo(this.modelSelector.selected, 'remove', _.bind(this.modelDeleted, this));
+            this.registerSubview(this.modelEditor);
+            this.modelEditor.render();
+        }
+    },
+    modelDeleted: function()
+    {
         if(this.modelEditor)
         {
             this.modelEditor.remove()
+            this.stopListening(this.modelSelector.selected);
             
             delete this.modelEditor;
         }
-
-        console.log(this.modelSelector.selected.name);
-
-        this.modelEditor = //this.renderSubview(
-            new ModelEditorView( {
-                el : $( '<div>' ).appendTo( this.queryByHook('editor') )[0],
-                model : this.modelSelector.selected,
-                parent : this
-            } )
-
-        this.registerSubview(this.modelEditor);
-        this.modelEditor.render();
-//, 
-  //      );
     },
     render: function()
     {
@@ -135,7 +145,7 @@ module.exports = {
 };
 
 
-},{"./forms/model":"/home/bbales2/modelEditor/forms/model.js","./models/model":"/home/bbales2/modelEditor/models/model.js","./select/model-collection":"/home/bbales2/modelEditor/select/model-collection.js","ampersand-model":"/home/bbales2/modelEditor/node_modules/ampersand-model/ampersand-model.js","ampersand-rest-collection":"/home/bbales2/modelEditor/node_modules/ampersand-rest-collection/ampersand-rest-collection.js","ampersand-view":"/home/bbales2/modelEditor/node_modules/ampersand-view/ampersand-view.js","andlog":"/home/bbales2/modelEditor/node_modules/andlog/andlog.js","clientconfig":"/home/bbales2/modelEditor/node_modules/clientconfig/clientconfig.js","domready":"/home/bbales2/modelEditor/node_modules/domready/ready.js","jquery":"/home/bbales2/modelEditor/node_modules/jquery/dist/jquery.js","underscore":"/home/bbales2/modelEditor/node_modules/underscore/underscore.js"}],"/home/bbales2/modelEditor/convertToPopulation/model.js":[function(require,module,exports){
+},{"./forms/model":"/home/bbales2/stochssModel/app/lib/modelEditor/forms/model.js","./models/model":"/home/bbales2/stochssModel/app/lib/modelEditor/models/model.js","./select/model-collection":"/home/bbales2/stochssModel/app/lib/modelEditor/select/model-collection.js","ampersand-model":"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/ampersand-model/ampersand-model.js","ampersand-rest-collection":"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/ampersand-rest-collection/ampersand-rest-collection.js","ampersand-view":"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/ampersand-view/ampersand-view.js","andlog":"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/andlog/andlog.js","clientconfig":"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/clientconfig/clientconfig.js","domready":"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/domready/ready.js","jquery":"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/jquery/dist/jquery.js","underscore":"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/underscore/underscore.js"}],"/home/bbales2/stochssModel/app/lib/modelEditor/convertToPopulation/model.js":[function(require,module,exports){
 var _ = require('underscore');
 var $ = require('jquery');
 var View = require('ampersand-view');
@@ -251,7 +261,7 @@ module.exports = View.extend({
     }
 });
 
-},{"../forms/tests":"/home/bbales2/modelEditor/forms/tests.js","./parameter-collection":"/home/bbales2/modelEditor/convertToPopulation/parameter-collection.js","./reaction":"/home/bbales2/modelEditor/convertToPopulation/reaction.js","./reaction-collection":"/home/bbales2/modelEditor/convertToPopulation/reaction-collection.js","./specie-collection":"/home/bbales2/modelEditor/convertToPopulation/specie-collection.js","ampersand-input-view":"/home/bbales2/modelEditor/node_modules/ampersand-input-view/ampersand-input-view.js","ampersand-view":"/home/bbales2/modelEditor/node_modules/ampersand-view/ampersand-view.js","jquery":"/home/bbales2/modelEditor/node_modules/jquery/dist/jquery.js","underscore":"/home/bbales2/modelEditor/node_modules/underscore/underscore.js"}],"/home/bbales2/modelEditor/convertToPopulation/parameter-collection.js":[function(require,module,exports){
+},{"../forms/tests":"/home/bbales2/stochssModel/app/lib/modelEditor/forms/tests.js","./parameter-collection":"/home/bbales2/stochssModel/app/lib/modelEditor/convertToPopulation/parameter-collection.js","./reaction":"/home/bbales2/stochssModel/app/lib/modelEditor/convertToPopulation/reaction.js","./reaction-collection":"/home/bbales2/stochssModel/app/lib/modelEditor/convertToPopulation/reaction-collection.js","./specie-collection":"/home/bbales2/stochssModel/app/lib/modelEditor/convertToPopulation/specie-collection.js","ampersand-input-view":"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/ampersand-input-view/ampersand-input-view.js","ampersand-view":"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/ampersand-view/ampersand-view.js","jquery":"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/jquery/dist/jquery.js","underscore":"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/underscore/underscore.js"}],"/home/bbales2/stochssModel/app/lib/modelEditor/convertToPopulation/parameter-collection.js":[function(require,module,exports){
 var $ = require('jquery');
 var View = require('ampersand-view');
 var ParameterView = require('./parameter');
@@ -269,7 +279,7 @@ var ParameterCollectionFormView = View.extend({
 });
 
 module.exports = ParameterCollectionFormView
-},{"./parameter":"/home/bbales2/modelEditor/convertToPopulation/parameter.js","ampersand-view":"/home/bbales2/modelEditor/node_modules/ampersand-view/ampersand-view.js","jquery":"/home/bbales2/modelEditor/node_modules/jquery/dist/jquery.js"}],"/home/bbales2/modelEditor/convertToPopulation/parameter.js":[function(require,module,exports){
+},{"./parameter":"/home/bbales2/stochssModel/app/lib/modelEditor/convertToPopulation/parameter.js","ampersand-view":"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/ampersand-view/ampersand-view.js","jquery":"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/jquery/dist/jquery.js"}],"/home/bbales2/stochssModel/app/lib/modelEditor/convertToPopulation/parameter.js":[function(require,module,exports){
 var _ = require('underscore');
 var $ = require('jquery');
 var View = require('ampersand-view');
@@ -290,7 +300,7 @@ module.exports = View.extend({
     }
 });
 
-},{"ampersand-view":"/home/bbales2/modelEditor/node_modules/ampersand-view/ampersand-view.js","jquery":"/home/bbales2/modelEditor/node_modules/jquery/dist/jquery.js","underscore":"/home/bbales2/modelEditor/node_modules/underscore/underscore.js"}],"/home/bbales2/modelEditor/convertToPopulation/reaction-collection.js":[function(require,module,exports){
+},{"ampersand-view":"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/ampersand-view/ampersand-view.js","jquery":"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/jquery/dist/jquery.js","underscore":"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/underscore/underscore.js"}],"/home/bbales2/stochssModel/app/lib/modelEditor/convertToPopulation/reaction-collection.js":[function(require,module,exports){
 var $ = require('jquery');
 var View = require('ampersand-view');
 var ReactionView = require('./reaction');
@@ -308,7 +318,7 @@ var ReactionCollectionView = View.extend({
 });
 
 module.exports = ReactionCollectionView
-},{"./reaction":"/home/bbales2/modelEditor/convertToPopulation/reaction.js","ampersand-view":"/home/bbales2/modelEditor/node_modules/ampersand-view/ampersand-view.js","jquery":"/home/bbales2/modelEditor/node_modules/jquery/dist/jquery.js"}],"/home/bbales2/modelEditor/convertToPopulation/reaction.js":[function(require,module,exports){
+},{"./reaction":"/home/bbales2/stochssModel/app/lib/modelEditor/convertToPopulation/reaction.js","ampersand-view":"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/ampersand-view/ampersand-view.js","jquery":"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/jquery/dist/jquery.js"}],"/home/bbales2/stochssModel/app/lib/modelEditor/convertToPopulation/reaction.js":[function(require,module,exports){
 var _ = require('underscore');
 var $ = require('jquery');
 var View = require('ampersand-view');
@@ -452,7 +462,7 @@ ReactionView.computeConversionFactor = function(reaction, volume)
 };
 
 module.exports = ReactionView;
-},{"ampersand-view":"/home/bbales2/modelEditor/node_modules/ampersand-view/ampersand-view.js","jquery":"/home/bbales2/modelEditor/node_modules/jquery/dist/jquery.js","katex":"/home/bbales2/modelEditor/node_modules/katex/katex.js","underscore":"/home/bbales2/modelEditor/node_modules/underscore/underscore.js"}],"/home/bbales2/modelEditor/convertToPopulation/specie-collection.js":[function(require,module,exports){
+},{"ampersand-view":"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/ampersand-view/ampersand-view.js","jquery":"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/jquery/dist/jquery.js","katex":"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/katex/katex.js","underscore":"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/underscore/underscore.js"}],"/home/bbales2/stochssModel/app/lib/modelEditor/convertToPopulation/specie-collection.js":[function(require,module,exports){
 var $ = require('jquery');
 var View = require('ampersand-view');
 var SpecieView = require('./specie');
@@ -470,7 +480,7 @@ var SpecieCollectionView = View.extend({
 });
 
 module.exports = SpecieCollectionView
-},{"./specie":"/home/bbales2/modelEditor/convertToPopulation/specie.js","ampersand-view":"/home/bbales2/modelEditor/node_modules/ampersand-view/ampersand-view.js","jquery":"/home/bbales2/modelEditor/node_modules/jquery/dist/jquery.js"}],"/home/bbales2/modelEditor/convertToPopulation/specie.js":[function(require,module,exports){
+},{"./specie":"/home/bbales2/stochssModel/app/lib/modelEditor/convertToPopulation/specie.js","ampersand-view":"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/ampersand-view/ampersand-view.js","jquery":"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/jquery/dist/jquery.js"}],"/home/bbales2/stochssModel/app/lib/modelEditor/convertToPopulation/specie.js":[function(require,module,exports){
 var _ = require('underscore');
 var $ = require('jquery');
 var View = require('ampersand-view');
@@ -500,7 +510,7 @@ module.exports = View.extend({
     }
 });
 
-},{"ampersand-view":"/home/bbales2/modelEditor/node_modules/ampersand-view/ampersand-view.js","jquery":"/home/bbales2/modelEditor/node_modules/jquery/dist/jquery.js","underscore":"/home/bbales2/modelEditor/node_modules/underscore/underscore.js"}],"/home/bbales2/modelEditor/forms/model.js":[function(require,module,exports){
+},{"ampersand-view":"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/ampersand-view/ampersand-view.js","jquery":"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/jquery/dist/jquery.js","underscore":"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/underscore/underscore.js"}],"/home/bbales2/stochssModel/app/lib/modelEditor/forms/model.js":[function(require,module,exports){
 var _ = require('underscore');
 var $ = require('jquery');
 var View = require('ampersand-view');
@@ -510,7 +520,7 @@ var ReactionCollectionFormView = require('./reaction-collection');
 var ModelConvert = require('../convertToPopulation/model');
 
 module.exports = View.extend({
-    template: "<div><div data-hook='editor'>Model type: <div data-hook='type'></div><div data-hook='specie'></div><div data-hook='parameter'></div><div data-hook='reaction'></div></div><div data-hook='convertToPopulation'></div><button data-hook='convertToPopulationButton'>Convert To Population</button></div>",
+    template: "<div><h3>Edit Model</h3><div data-hook='editor'>Model type: <span data-hook='type'></span><hr /><div data-hook='specie'></div><hr /><div data-hook='parameter'></div><hr /><div data-hook='reaction'></div></div><div data-hook='convertToPopulation'></div><button data-hook='convertToPopulationButton'>Convert To Population</button></div>",
     // Gotta have a few of these functions just so this works as a form view
     // This gets called when things update
     props: {
@@ -617,7 +627,7 @@ module.exports = View.extend({
     }
 });
 
-},{"../convertToPopulation/model":"/home/bbales2/modelEditor/convertToPopulation/model.js","./parameter-collection":"/home/bbales2/modelEditor/forms/parameter-collection.js","./reaction-collection":"/home/bbales2/modelEditor/forms/reaction-collection.js","./specie-collection":"/home/bbales2/modelEditor/forms/specie-collection.js","ampersand-view":"/home/bbales2/modelEditor/node_modules/ampersand-view/ampersand-view.js","jquery":"/home/bbales2/modelEditor/node_modules/jquery/dist/jquery.js","underscore":"/home/bbales2/modelEditor/node_modules/underscore/underscore.js"}],"/home/bbales2/modelEditor/forms/modifying-input-view.js":[function(require,module,exports){
+},{"../convertToPopulation/model":"/home/bbales2/stochssModel/app/lib/modelEditor/convertToPopulation/model.js","./parameter-collection":"/home/bbales2/stochssModel/app/lib/modelEditor/forms/parameter-collection.js","./reaction-collection":"/home/bbales2/stochssModel/app/lib/modelEditor/forms/reaction-collection.js","./specie-collection":"/home/bbales2/stochssModel/app/lib/modelEditor/forms/specie-collection.js","ampersand-view":"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/ampersand-view/ampersand-view.js","jquery":"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/jquery/dist/jquery.js","underscore":"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/underscore/underscore.js"}],"/home/bbales2/stochssModel/app/lib/modelEditor/forms/modifying-input-view.js":[function(require,module,exports){
 var $ = require('jquery');
 var _ = require('underscore');
 var InputView = require('ampersand-input-view');
@@ -645,7 +655,7 @@ ModifyingInputView = InputView.extend({
 });
 
 module.exports = ModifyingInputView
-},{"ampersand-input-view":"/home/bbales2/modelEditor/node_modules/ampersand-input-view/ampersand-input-view.js","jquery":"/home/bbales2/modelEditor/node_modules/jquery/dist/jquery.js","underscore":"/home/bbales2/modelEditor/node_modules/underscore/underscore.js"}],"/home/bbales2/modelEditor/forms/modifying-number-input-view.js":[function(require,module,exports){
+},{"ampersand-input-view":"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/ampersand-input-view/ampersand-input-view.js","jquery":"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/jquery/dist/jquery.js","underscore":"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/underscore/underscore.js"}],"/home/bbales2/stochssModel/app/lib/modelEditor/forms/modifying-number-input-view.js":[function(require,module,exports){
 var $ = require('jquery');
 var _ = require('underscore');
 var ModifyingInputView = require('./modifying-input-view');
@@ -659,7 +669,7 @@ ModifyingNumberInputView = ModifyingInputView.extend({
 });
 
 module.exports = ModifyingNumberInputView
-},{"./modifying-input-view":"/home/bbales2/modelEditor/forms/modifying-input-view.js","jquery":"/home/bbales2/modelEditor/node_modules/jquery/dist/jquery.js","underscore":"/home/bbales2/modelEditor/node_modules/underscore/underscore.js"}],"/home/bbales2/modelEditor/forms/modifying-select-view.js":[function(require,module,exports){
+},{"./modifying-input-view":"/home/bbales2/stochssModel/app/lib/modelEditor/forms/modifying-input-view.js","jquery":"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/jquery/dist/jquery.js","underscore":"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/underscore/underscore.js"}],"/home/bbales2/stochssModel/app/lib/modelEditor/forms/modifying-select-view.js":[function(require,module,exports){
 var $ = require('jquery');
 var _ = require('underscore');
 var SelectView = require('ampersand-select-view');
@@ -679,7 +689,7 @@ var ModifyingSelectView = _.extend(SelectView, {
 });
 
 module.exports = ModifyingSelectView
-},{"ampersand-select-view":"/home/bbales2/modelEditor/node_modules/ampersand-select-view/ampersand-select-view.js","jquery":"/home/bbales2/modelEditor/node_modules/jquery/dist/jquery.js","underscore":"/home/bbales2/modelEditor/node_modules/underscore/underscore.js"}],"/home/bbales2/modelEditor/forms/parameter-collection.js":[function(require,module,exports){
+},{"ampersand-select-view":"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/ampersand-select-view/ampersand-select-view.js","jquery":"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/jquery/dist/jquery.js","underscore":"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/underscore/underscore.js"}],"/home/bbales2/stochssModel/app/lib/modelEditor/forms/parameter-collection.js":[function(require,module,exports){
 var $ = require('jquery');
 var AmpersandView = require('ampersand-view');
 var AmpersandFormView = require('ampersand-form-view');
@@ -713,7 +723,7 @@ var AddNewParameterForm = AmpersandFormView.extend({
                 label: 'Name',
                 name: 'name',
                 value: '',
-                required: false,
+                required: true,
                 placeholder: 'NewParameters',
                 tests: [].concat(Tests.naming(this.collection))
             }),
@@ -721,7 +731,7 @@ var AddNewParameterForm = AmpersandFormView.extend({
                 label: 'Value',
                 name: 'value',
                 value: '0',
-                required: false,
+                required: true,
                 placeholder: '0',
                 tests: []
             })
@@ -739,7 +749,7 @@ var AddNewParameterForm = AmpersandFormView.extend({
 });
 
 var ParameterCollectionFormView = AmpersandView.extend({
-    template: "<div><div>Parameters editor<div><table data-hook='parametersTable'></table>Add Parameter: <form data-hook='addParametersForm'></form></div>",
+    template: "<div><h4>Parameters editor</h4><table class='table table-bordered'><thead><th></th><th>Name</th><th>Value</th></thead><tbody data-hook='parametersTable'></tbody></table>Add Parameter: <form data-hook='addParametersForm'></form></div>",
     initialize: function(attr, options)
     {
         AmpersandView.prototype.initialize.call(this, attr, options);
@@ -764,7 +774,7 @@ var ParameterCollectionFormView = AmpersandView.extend({
 });
 
 module.exports = ParameterCollectionFormView
-},{"./parameter":"/home/bbales2/modelEditor/forms/parameter.js","./tests":"/home/bbales2/modelEditor/forms/tests.js","ampersand-form-view":"/home/bbales2/modelEditor/node_modules/ampersand-form-view/ampersand-form-view.js","ampersand-input-view":"/home/bbales2/modelEditor/node_modules/ampersand-input-view/ampersand-input-view.js","ampersand-view":"/home/bbales2/modelEditor/node_modules/ampersand-view/ampersand-view.js","jquery":"/home/bbales2/modelEditor/node_modules/jquery/dist/jquery.js"}],"/home/bbales2/modelEditor/forms/parameter.js":[function(require,module,exports){
+},{"./parameter":"/home/bbales2/stochssModel/app/lib/modelEditor/forms/parameter.js","./tests":"/home/bbales2/stochssModel/app/lib/modelEditor/forms/tests.js","ampersand-form-view":"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/ampersand-form-view/ampersand-form-view.js","ampersand-input-view":"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/ampersand-input-view/ampersand-input-view.js","ampersand-view":"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/ampersand-view/ampersand-view.js","jquery":"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/jquery/dist/jquery.js"}],"/home/bbales2/stochssModel/app/lib/modelEditor/forms/parameter.js":[function(require,module,exports){
 var _ = require('underscore');
 var $ = require('jquery');
 var View = require('ampersand-view');
@@ -799,6 +809,7 @@ module.exports = View.extend({
 
         this.renderSubview(
             new ModifyingInputView({
+                template: '<span><span data-hook="label"></span><input><span data-hook="message-container"><span data-hook="message-text"></span></span></span>',
                 label: 'Name',
                 name: 'name',
                 value: this.model.name,
@@ -810,6 +821,7 @@ module.exports = View.extend({
 
         this.renderSubview(
             new ModifyingInputView({
+                template: '<span><span data-hook="label"></span><input><span data-hook="message-container"><span data-hook="message-text"></span></span></span>',
                 label: 'Value',
                 name: 'value',
                 value: this.model.value,
@@ -819,11 +831,14 @@ module.exports = View.extend({
                 tests: []
             }), this.el.querySelector("[data-hook='value']"));
         
+        //Hide all the labels!
+        $( this.el ).find('[data-hook="label"]').hide();
+
         return this;
     }
 });
 
-},{"./modifying-input-view":"/home/bbales2/modelEditor/forms/modifying-input-view.js","./modifying-number-input-view":"/home/bbales2/modelEditor/forms/modifying-number-input-view.js","./tests":"/home/bbales2/modelEditor/forms/tests.js","ampersand-view":"/home/bbales2/modelEditor/node_modules/ampersand-view/ampersand-view.js","jquery":"/home/bbales2/modelEditor/node_modules/jquery/dist/jquery.js","underscore":"/home/bbales2/modelEditor/node_modules/underscore/underscore.js"}],"/home/bbales2/modelEditor/forms/reaction-collection.js":[function(require,module,exports){
+},{"./modifying-input-view":"/home/bbales2/stochssModel/app/lib/modelEditor/forms/modifying-input-view.js","./modifying-number-input-view":"/home/bbales2/stochssModel/app/lib/modelEditor/forms/modifying-number-input-view.js","./tests":"/home/bbales2/stochssModel/app/lib/modelEditor/forms/tests.js","ampersand-view":"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/ampersand-view/ampersand-view.js","jquery":"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/jquery/dist/jquery.js","underscore":"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/underscore/underscore.js"}],"/home/bbales2/stochssModel/app/lib/modelEditor/forms/reaction-collection.js":[function(require,module,exports){
 var $ = require('jquery');
 var AmpersandView = require('ampersand-view');
 var AmpersandFormView = require('ampersand-form-view');
@@ -918,7 +933,7 @@ var AddNewReactionForm = AmpersandFormView.extend({
 });
 
 var ReactionCollectionFormView = AmpersandView.extend({
-    template: "<div><div>Reactions editor<div><table border='1' data-hook='reactionTable'></table>Add Reaction: <form data-hook='addReactionForm'></form></div>",
+    template: "<div><h4>Reactions editor</h4><table><thead><th><button style='visibility:hidden'>x</button></th><th width='218px'>Name</th><th width='218px'>Parameter</th><th width='218px'>Rate</th></thead></table><div data-hook='reactionTable'></div><h4>Add Reaction</h4><form data-hook='addReactionForm'></form></div>",
     initialize: function(attr, options)
     {
         AmpersandView.prototype.initialize.call(this, attr, options);
@@ -943,7 +958,7 @@ var ReactionCollectionFormView = AmpersandView.extend({
 });
 
 module.exports = ReactionCollectionFormView
-},{"./reaction":"/home/bbales2/modelEditor/forms/reaction.js","./tests":"/home/bbales2/modelEditor/forms/tests.js","ampersand-form-view":"/home/bbales2/modelEditor/node_modules/ampersand-form-view/ampersand-form-view.js","ampersand-input-view":"/home/bbales2/modelEditor/node_modules/ampersand-input-view/ampersand-input-view.js","ampersand-select-view":"/home/bbales2/modelEditor/node_modules/ampersand-select-view/ampersand-select-view.js","ampersand-view":"/home/bbales2/modelEditor/node_modules/ampersand-view/ampersand-view.js","jquery":"/home/bbales2/modelEditor/node_modules/jquery/dist/jquery.js"}],"/home/bbales2/modelEditor/forms/reaction.js":[function(require,module,exports){
+},{"./reaction":"/home/bbales2/stochssModel/app/lib/modelEditor/forms/reaction.js","./tests":"/home/bbales2/stochssModel/app/lib/modelEditor/forms/tests.js","ampersand-form-view":"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/ampersand-form-view/ampersand-form-view.js","ampersand-input-view":"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/ampersand-input-view/ampersand-input-view.js","ampersand-select-view":"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/ampersand-select-view/ampersand-select-view.js","ampersand-view":"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/ampersand-view/ampersand-view.js","jquery":"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/jquery/dist/jquery.js"}],"/home/bbales2/stochssModel/app/lib/modelEditor/forms/reaction.js":[function(require,module,exports){
 var _ = require('underscore');
 var $ = require('jquery');
 var View = require('ampersand-view');
@@ -956,7 +971,23 @@ var katex = require('katex')
 
 var Tests = require('./tests');
 module.exports = View.extend({
-    template: "<tr><button>x</button><td data-hook='name'></td><td data-hook='typeSelect'></td><td data-hook='parameter'></td><td data-hook='equation'></td><td data-hook='latex'></td><td data-hook='reactants'></td><td data-hook='products'></td></tr>",
+    template: "<div>\
+<div data-hook='basic'>\
+  <button data-hook='remove'>x</button>\
+  <span data-hook='name'></span> \
+  <span data-hook='typeSelect'></span> \
+  <span data-hook='parameter'></span> \
+  <span data-hook='equation'></span> \
+  <span data-hook='latex'></span> \
+  <button data-hook='edit'>Edit</button>\
+</div>\
+<table width='100%' data-hook='advanced'>\
+  <tr> \
+    <td><h4>Reactants</h4><div data-hook='reactants'></div></td>\
+    <td><h4>Products</h4><div data-hook='products'></div></td>\
+  </tr>\
+</table>\
+</div>",
     // Gotta have a few of these functions just so this works as a form view
     // This gets called when things update
     update: function(obj)
@@ -1012,6 +1043,14 @@ module.exports = View.extend({
     {
         this.model.collection.remove(this.model);        
     },
+    toggleEdit: function()
+    {
+        $( this.queryByHook('advanced') ).toggle();
+    },
+    events: {
+        "click [data-hook='remove']" : "removeModel",
+        "click [data-hook='edit']" : "toggleEdit"
+    },
     bindings: {
         'model.type' : {
             type: 'switch',
@@ -1025,14 +1064,17 @@ module.exports = View.extend({
     {
         View.prototype.render.apply(this, arguments);
 
+        $( this.queryByHook('advanced') ).hide();
+
         this.baseModel = this.model.collection.parent;
 
-        this.listenTo(this.model, 'change', this.redrawLatex);
-        this.listenTo(this.model.reactants, 'add remove change', this.redrawLatex);
-        this.listenToAndRun(this.model.products, 'add remove change', this.redrawLatex);
+        this.listenTo(this.model, 'change', _.bind(this.redrawLatex, this));
+        this.listenTo(this.model.reactants, 'add remove change', _.bind(this.redrawLatex, this));
+        this.listenToAndRun(this.model.products, 'add remove change', _.bind(this.redrawLatex, this));
 
         this.renderSubview(
             new ModifyingInputView({
+                template: '<span><span data-hook="label"></span><input><span data-hook="message-container"><span data-hook="message-text"></span></span></span>',
                 label: 'Name',
                 name: 'name',
                 value: this.model.name,
@@ -1044,6 +1086,7 @@ module.exports = View.extend({
 
         this.renderSubview(
             new SelectView({
+                template: '<span><span data-hook="label"></span><select></select><span data-hook="message-container"><span data-hook="message-text"></span></span></span>',
                 label: 'Type',
                 name: 'type',
                 value: this.model.type,
@@ -1053,6 +1096,7 @@ module.exports = View.extend({
 
         this.renderSubview(
             new SelectView({
+                template: '<span><span data-hook="label"></span><select></select><span data-hook="message-container"><span data-hook="message-text"></span></span></span>',
                 label: 'Parameter',
                 name: 'parameter',
                 value: this.model.rate,
@@ -1065,6 +1109,7 @@ module.exports = View.extend({
 
         this.renderSubview(
             new ModifyingInputView({
+                template: '<span><span data-hook="label"></span><input><span data-hook="message-container"><span data-hook="message-text"></span></span></span>',
                 label: 'Equation',
                 name: 'equation',
                 value: this.model.equation,
@@ -1084,11 +1129,14 @@ module.exports = View.extend({
                 collection: this.model.products
             }), this.el.querySelector("[data-hook='products']"));
         
+        //Hide all the labels!
+        $( this.queryByHook('basic') ).find('[data-hook="label"]').hide();
+        
         return this;
     }
 });
 
-},{"./modifying-input-view":"/home/bbales2/modelEditor/forms/modifying-input-view.js","./modifying-number-input-view":"/home/bbales2/modelEditor/forms/modifying-number-input-view.js","./stoich-specie-collection":"/home/bbales2/modelEditor/forms/stoich-specie-collection.js","./tests":"/home/bbales2/modelEditor/forms/tests.js","ampersand-select-view":"/home/bbales2/modelEditor/node_modules/ampersand-select-view/ampersand-select-view.js","ampersand-view":"/home/bbales2/modelEditor/node_modules/ampersand-view/ampersand-view.js","jquery":"/home/bbales2/modelEditor/node_modules/jquery/dist/jquery.js","katex":"/home/bbales2/modelEditor/node_modules/katex/katex.js","underscore":"/home/bbales2/modelEditor/node_modules/underscore/underscore.js"}],"/home/bbales2/modelEditor/forms/specie-collection.js":[function(require,module,exports){
+},{"./modifying-input-view":"/home/bbales2/stochssModel/app/lib/modelEditor/forms/modifying-input-view.js","./modifying-number-input-view":"/home/bbales2/stochssModel/app/lib/modelEditor/forms/modifying-number-input-view.js","./stoich-specie-collection":"/home/bbales2/stochssModel/app/lib/modelEditor/forms/stoich-specie-collection.js","./tests":"/home/bbales2/stochssModel/app/lib/modelEditor/forms/tests.js","ampersand-select-view":"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/ampersand-select-view/ampersand-select-view.js","ampersand-view":"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/ampersand-view/ampersand-view.js","jquery":"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/jquery/dist/jquery.js","katex":"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/katex/katex.js","underscore":"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/underscore/underscore.js"}],"/home/bbales2/stochssModel/app/lib/modelEditor/forms/specie-collection.js":[function(require,module,exports){
 var $ = require('jquery');
 var AmpersandView = require('ampersand-view');
 var AmpersandFormView = require('ampersand-form-view');
@@ -1122,7 +1170,7 @@ var AddNewSpecieForm = AmpersandFormView.extend({
                 label: 'Name',
                 name: 'name',
                 value: '',
-                required: false,
+                required: true,
                 placeholder: 'NewSpecies',
                 tests: [].concat(Tests.naming(this.collection))
             }),
@@ -1130,7 +1178,7 @@ var AddNewSpecieForm = AmpersandFormView.extend({
                 label: 'Initial Condition',
                 name: 'initialCondition',
                 value: '0',
-                required: false,
+                required: true,
                 placeholder: '0',
                 tests: [].concat(Tests.nonzero(), Tests.units(this.collection.parent))
             })
@@ -1160,7 +1208,7 @@ var AddNewSpecieForm = AmpersandFormView.extend({
 new TestForm();*/
 
 var SpecieCollectionFormView = AmpersandView.extend({
-    template: "<div><div>Species editor<div><table data-hook='speciesTable'></table>Add Specie: <form data-hook='addSpeciesForm'></form></div>",
+    template: "<div><h4>Species editor</h4><table><thead><th></th><th>Name</th><th>Initial Condition</th></thead><tbody data-hook='speciesTable'></tbody></table>Add Specie: <form data-hook='addSpeciesForm'></form></div>",
     initialize: function(attr, options)
     {
         AmpersandView.prototype.initialize.call(this, attr, options);
@@ -1187,7 +1235,7 @@ var SpecieCollectionFormView = AmpersandView.extend({
 });
 
 module.exports = SpecieCollectionFormView
-},{"./specie":"/home/bbales2/modelEditor/forms/specie.js","./tests":"/home/bbales2/modelEditor/forms/tests.js","ampersand-form-view":"/home/bbales2/modelEditor/node_modules/ampersand-form-view/ampersand-form-view.js","ampersand-input-view":"/home/bbales2/modelEditor/node_modules/ampersand-input-view/ampersand-input-view.js","ampersand-view":"/home/bbales2/modelEditor/node_modules/ampersand-view/ampersand-view.js","jquery":"/home/bbales2/modelEditor/node_modules/jquery/dist/jquery.js"}],"/home/bbales2/modelEditor/forms/specie.js":[function(require,module,exports){
+},{"./specie":"/home/bbales2/stochssModel/app/lib/modelEditor/forms/specie.js","./tests":"/home/bbales2/stochssModel/app/lib/modelEditor/forms/tests.js","ampersand-form-view":"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/ampersand-form-view/ampersand-form-view.js","ampersand-input-view":"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/ampersand-input-view/ampersand-input-view.js","ampersand-view":"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/ampersand-view/ampersand-view.js","jquery":"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/jquery/dist/jquery.js"}],"/home/bbales2/stochssModel/app/lib/modelEditor/forms/specie.js":[function(require,module,exports){
 var _ = require('underscore');
 var $ = require('jquery');
 var View = require('ampersand-view');
@@ -1222,6 +1270,7 @@ module.exports = View.extend({
 
         this.renderSubview(
             new ModifyingInputView({
+                template: '<span><span data-hook="label"></span><input><span data-hook="message-container"><span data-hook="message-text"></span></span></span>',
                 label: 'Name',
                 name: 'name',
                 value: this.model.name,
@@ -1233,6 +1282,7 @@ module.exports = View.extend({
 
         this.renderSubview(
             new ModifyingNumberInputView({
+                template: '<span><span data-hook="label"></span><input><span data-hook="message-container"><span data-hook="message-text"></span></span></span>',
                 label: 'Initial Condition',
                 name: 'initialCondition',
                 value: this.model.initialCondition,
@@ -1241,12 +1291,15 @@ module.exports = View.extend({
                 model : this.model,
                 tests: [].concat(Tests.nonzero(), Tests.units(this.model.collection.parent))
             }), this.el.querySelector("[data-hook='initialCondition']"));
-        
+
+        //Hide all the labels!
+        $( this.el ).find('[data-hook="label"]').hide();
+
         return this;
     }
 });
 
-},{"./modifying-input-view":"/home/bbales2/modelEditor/forms/modifying-input-view.js","./modifying-number-input-view":"/home/bbales2/modelEditor/forms/modifying-number-input-view.js","./tests":"/home/bbales2/modelEditor/forms/tests.js","ampersand-view":"/home/bbales2/modelEditor/node_modules/ampersand-view/ampersand-view.js","jquery":"/home/bbales2/modelEditor/node_modules/jquery/dist/jquery.js","underscore":"/home/bbales2/modelEditor/node_modules/underscore/underscore.js"}],"/home/bbales2/modelEditor/forms/stoich-specie-collection.js":[function(require,module,exports){
+},{"./modifying-input-view":"/home/bbales2/stochssModel/app/lib/modelEditor/forms/modifying-input-view.js","./modifying-number-input-view":"/home/bbales2/stochssModel/app/lib/modelEditor/forms/modifying-number-input-view.js","./tests":"/home/bbales2/stochssModel/app/lib/modelEditor/forms/tests.js","ampersand-view":"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/ampersand-view/ampersand-view.js","jquery":"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/jquery/dist/jquery.js","underscore":"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/underscore/underscore.js"}],"/home/bbales2/stochssModel/app/lib/modelEditor/forms/stoich-specie-collection.js":[function(require,module,exports){
 var $ = require('jquery');
 var AmpersandView = require('ampersand-view');
 var AmpersandFormView = require('ampersand-form-view');
@@ -1307,7 +1360,7 @@ var AddNewStoichSpecieForm = AmpersandFormView.extend({
 });
 
 var StoichSpecieCollectionFormView = AmpersandView.extend({
-    template: "<div><div>Stoichiometry editor<div><table data-hook='stoichSpecieTable'></table>Add Stoichiometric Specie: <form data-hook='addStoichSpecieForm'></form></div>",
+    template: "<div><table data-hook='stoichSpecieTable'></table>Add Specie: <form data-hook='addStoichSpecieForm'></form></div>",
     initialize: function(attr, options)
     {
         AmpersandView.prototype.initialize.call(this, attr, options);
@@ -1332,7 +1385,7 @@ var StoichSpecieCollectionFormView = AmpersandView.extend({
 });
 
 module.exports = StoichSpecieCollectionFormView
-},{"./stoich-specie":"/home/bbales2/modelEditor/forms/stoich-specie.js","./tests":"/home/bbales2/modelEditor/forms/tests.js","ampersand-form-view":"/home/bbales2/modelEditor/node_modules/ampersand-form-view/ampersand-form-view.js","ampersand-input-view":"/home/bbales2/modelEditor/node_modules/ampersand-input-view/ampersand-input-view.js","ampersand-select-view":"/home/bbales2/modelEditor/node_modules/ampersand-select-view/ampersand-select-view.js","ampersand-view":"/home/bbales2/modelEditor/node_modules/ampersand-view/ampersand-view.js","jquery":"/home/bbales2/modelEditor/node_modules/jquery/dist/jquery.js"}],"/home/bbales2/modelEditor/forms/stoich-specie.js":[function(require,module,exports){
+},{"./stoich-specie":"/home/bbales2/stochssModel/app/lib/modelEditor/forms/stoich-specie.js","./tests":"/home/bbales2/stochssModel/app/lib/modelEditor/forms/tests.js","ampersand-form-view":"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/ampersand-form-view/ampersand-form-view.js","ampersand-input-view":"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/ampersand-input-view/ampersand-input-view.js","ampersand-select-view":"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/ampersand-select-view/ampersand-select-view.js","ampersand-view":"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/ampersand-view/ampersand-view.js","jquery":"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/jquery/dist/jquery.js"}],"/home/bbales2/stochssModel/app/lib/modelEditor/forms/stoich-specie.js":[function(require,module,exports){
 var _ = require('underscore');
 var $ = require('jquery');
 var View = require('ampersand-view');
@@ -1366,6 +1419,7 @@ module.exports = View.extend({
 
         this.renderSubview(
             new ModifyingSelectView({
+                template: '<span><span data-hook="label"></span><select></select><span data-hook="message-container"><span data-hook="message-text"></span></span></span>',
                 label: 'Species',
                 name: 'specie',
                 value: this.model.specie,
@@ -1378,6 +1432,7 @@ module.exports = View.extend({
 
         this.renderSubview(
             new ModifyingNumberInputView({
+                template: '<span><span data-hook="label"></span><input><span data-hook="message-container"><span data-hook="message-text"></span></span></span>',
                 label: 'Stoichiometry',
                 name: 'stoichiometry',
                 value: this.model.stoichiometry,
@@ -1387,11 +1442,15 @@ module.exports = View.extend({
                 tests: [].concat(Tests.nonzero(), Tests.integer())
             }), this.el.querySelector("[data-hook='stoichiometry']"));
         
+        //Hide all the labels!
+        $( this.el ).find('[data-hook="label"]').hide();
+        $( this.el ).find('input, select').css('width', '100px');
+        
         return this;
     }
 });
 
-},{"./modifying-number-input-view":"/home/bbales2/modelEditor/forms/modifying-number-input-view.js","./modifying-select-view":"/home/bbales2/modelEditor/forms/modifying-select-view.js","./tests":"/home/bbales2/modelEditor/forms/tests.js","ampersand-view":"/home/bbales2/modelEditor/node_modules/ampersand-view/ampersand-view.js","jquery":"/home/bbales2/modelEditor/node_modules/jquery/dist/jquery.js","underscore":"/home/bbales2/modelEditor/node_modules/underscore/underscore.js"}],"/home/bbales2/modelEditor/forms/tests.js":[function(require,module,exports){
+},{"./modifying-number-input-view":"/home/bbales2/stochssModel/app/lib/modelEditor/forms/modifying-number-input-view.js","./modifying-select-view":"/home/bbales2/stochssModel/app/lib/modelEditor/forms/modifying-select-view.js","./tests":"/home/bbales2/stochssModel/app/lib/modelEditor/forms/tests.js","ampersand-view":"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/ampersand-view/ampersand-view.js","jquery":"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/jquery/dist/jquery.js","underscore":"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/underscore/underscore.js"}],"/home/bbales2/stochssModel/app/lib/modelEditor/forms/tests.js":[function(require,module,exports){
 var _ = require('underscore');
 
 module.exports = {
@@ -1443,7 +1502,7 @@ module.exports = {
         }
     }
 };
-},{"underscore":"/home/bbales2/modelEditor/node_modules/underscore/underscore.js"}],"/home/bbales2/modelEditor/models/model.js":[function(require,module,exports){
+},{"underscore":"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/underscore/underscore.js"}],"/home/bbales2/stochssModel/app/lib/modelEditor/models/model.js":[function(require,module,exports){
 var _ = require('underscore');
 var AmpersandModel = require('ampersand-model');
 var SpecieCollection = require('./specie-collection');
@@ -1637,7 +1696,7 @@ Model.buildFromJSON = function(json, model)
 
 module.exports = Model;
 
-},{"./parameter-collection":"/home/bbales2/modelEditor/models/parameter-collection.js","./reaction-collection":"/home/bbales2/modelEditor/models/reaction-collection.js","./specie-collection":"/home/bbales2/modelEditor/models/specie-collection.js","ampersand-model":"/home/bbales2/modelEditor/node_modules/ampersand-model/ampersand-model.js","underscore":"/home/bbales2/modelEditor/node_modules/underscore/underscore.js"}],"/home/bbales2/modelEditor/models/parameter-collection.js":[function(require,module,exports){
+},{"./parameter-collection":"/home/bbales2/stochssModel/app/lib/modelEditor/models/parameter-collection.js","./reaction-collection":"/home/bbales2/stochssModel/app/lib/modelEditor/models/reaction-collection.js","./specie-collection":"/home/bbales2/stochssModel/app/lib/modelEditor/models/specie-collection.js","ampersand-model":"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/ampersand-model/ampersand-model.js","underscore":"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/underscore/underscore.js"}],"/home/bbales2/stochssModel/app/lib/modelEditor/models/parameter-collection.js":[function(require,module,exports){
 // parameter Collection - parameter-collection.js
 var AmpCollection = require('ampersand-collection');
 var parameter = require('./parameter');
@@ -1655,7 +1714,7 @@ module.exports = AmpCollection.extend({
         return this.add({ name : name, value : value });
     }
 });
-},{"./parameter":"/home/bbales2/modelEditor/models/parameter.js","ampersand-collection":"/home/bbales2/modelEditor/node_modules/ampersand-collection/ampersand-collection.js"}],"/home/bbales2/modelEditor/models/parameter.js":[function(require,module,exports){
+},{"./parameter":"/home/bbales2/stochssModel/app/lib/modelEditor/models/parameter.js","ampersand-collection":"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/ampersand-collection/ampersand-collection.js"}],"/home/bbales2/stochssModel/app/lib/modelEditor/models/parameter.js":[function(require,module,exports){
 // parameter Model - parameter.js
 var _ = require('underscore');
 var AmpModel = require('ampersand-model');
@@ -1688,7 +1747,7 @@ module.exports = AmpModel.extend({
         );
     }
 });
-},{"ampersand-model":"/home/bbales2/modelEditor/node_modules/ampersand-model/ampersand-model.js","underscore":"/home/bbales2/modelEditor/node_modules/underscore/underscore.js"}],"/home/bbales2/modelEditor/models/reaction-collection.js":[function(require,module,exports){
+},{"ampersand-model":"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/ampersand-model/ampersand-model.js","underscore":"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/underscore/underscore.js"}],"/home/bbales2/stochssModel/app/lib/modelEditor/models/reaction-collection.js":[function(require,module,exports){
 var AmpCollection = require('ampersand-collection');
 var Reaction = require('./reaction');
 
@@ -1730,7 +1789,7 @@ module.exports = AmpCollection.extend({
     }
 });
 
-},{"./reaction":"/home/bbales2/modelEditor/models/reaction.js","ampersand-collection":"/home/bbales2/modelEditor/node_modules/ampersand-collection/ampersand-collection.js"}],"/home/bbales2/modelEditor/models/reaction.js":[function(require,module,exports){
+},{"./reaction":"/home/bbales2/stochssModel/app/lib/modelEditor/models/reaction.js","ampersand-collection":"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/ampersand-collection/ampersand-collection.js"}],"/home/bbales2/stochssModel/app/lib/modelEditor/models/reaction.js":[function(require,module,exports){
 var _ = require('underscore');
 var State = require('ampersand-state');
 var StoichSpecie = require('./stoich-specie');
@@ -1779,7 +1838,7 @@ var Reaction = State.extend({
 
 module.exports = Reaction;
 
-},{"./parameter":"/home/bbales2/modelEditor/models/parameter.js","./stoich-specie":"/home/bbales2/modelEditor/models/stoich-specie.js","./stoich-specie-collection":"/home/bbales2/modelEditor/models/stoich-specie-collection.js","ampersand-state":"/home/bbales2/modelEditor/node_modules/ampersand-state/ampersand-state.js","underscore":"/home/bbales2/modelEditor/node_modules/underscore/underscore.js"}],"/home/bbales2/modelEditor/models/specie-collection.js":[function(require,module,exports){
+},{"./parameter":"/home/bbales2/stochssModel/app/lib/modelEditor/models/parameter.js","./stoich-specie":"/home/bbales2/stochssModel/app/lib/modelEditor/models/stoich-specie.js","./stoich-specie-collection":"/home/bbales2/stochssModel/app/lib/modelEditor/models/stoich-specie-collection.js","ampersand-state":"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/ampersand-state/ampersand-state.js","underscore":"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/underscore/underscore.js"}],"/home/bbales2/stochssModel/app/lib/modelEditor/models/specie-collection.js":[function(require,module,exports){
 // specie Collection - specie-collection.js
 var AmpCollection = require('ampersand-collection');
 var specie = require('./specie');
@@ -1796,7 +1855,7 @@ module.exports = AmpCollection.extend({
         return this.add({ name : name, initialCondition : initialCondition });
     }
 });
-},{"./specie":"/home/bbales2/modelEditor/models/specie.js","ampersand-collection":"/home/bbales2/modelEditor/node_modules/ampersand-collection/ampersand-collection.js"}],"/home/bbales2/modelEditor/models/specie.js":[function(require,module,exports){
+},{"./specie":"/home/bbales2/stochssModel/app/lib/modelEditor/models/specie.js","ampersand-collection":"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/ampersand-collection/ampersand-collection.js"}],"/home/bbales2/stochssModel/app/lib/modelEditor/models/specie.js":[function(require,module,exports){
 // specie Model - specie.js
 var _ = require('underscore');
 var AmpModel = require('ampersand-model');
@@ -1833,7 +1892,7 @@ module.exports = AmpModel.extend({
         );
     }
 });
-},{"ampersand-model":"/home/bbales2/modelEditor/node_modules/ampersand-model/ampersand-model.js","underscore":"/home/bbales2/modelEditor/node_modules/underscore/underscore.js"}],"/home/bbales2/modelEditor/models/stoich-specie-collection.js":[function(require,module,exports){
+},{"ampersand-model":"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/ampersand-model/ampersand-model.js","underscore":"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/underscore/underscore.js"}],"/home/bbales2/stochssModel/app/lib/modelEditor/models/stoich-specie-collection.js":[function(require,module,exports){
 var AmpCollection = require('ampersand-collection');
 var StoichSpecie = require('./stoich-specie');
 
@@ -1855,7 +1914,7 @@ module.exports = AmpCollection.extend({
     }
 });
 
-},{"./stoich-specie":"/home/bbales2/modelEditor/models/stoich-specie.js","ampersand-collection":"/home/bbales2/modelEditor/node_modules/ampersand-collection/ampersand-collection.js"}],"/home/bbales2/modelEditor/models/stoich-specie.js":[function(require,module,exports){
+},{"./stoich-specie":"/home/bbales2/stochssModel/app/lib/modelEditor/models/stoich-specie.js","ampersand-collection":"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/ampersand-collection/ampersand-collection.js"}],"/home/bbales2/stochssModel/app/lib/modelEditor/models/stoich-specie.js":[function(require,module,exports){
 var _ = require('underscore');
 var State = require('ampersand-state');
 var Specie = require('./specie');
@@ -1877,7 +1936,7 @@ var StoichSpecie = State.extend({
 
 module.exports = StoichSpecie;
 
-},{"./specie":"/home/bbales2/modelEditor/models/specie.js","ampersand-state":"/home/bbales2/modelEditor/node_modules/ampersand-state/ampersand-state.js","underscore":"/home/bbales2/modelEditor/node_modules/underscore/underscore.js"}],"/home/bbales2/modelEditor/node_modules/ampersand-collection/ampersand-collection.js":[function(require,module,exports){
+},{"./specie":"/home/bbales2/stochssModel/app/lib/modelEditor/models/specie.js","ampersand-state":"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/ampersand-state/ampersand-state.js","underscore":"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/underscore/underscore.js"}],"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/ampersand-collection/ampersand-collection.js":[function(require,module,exports){
 var BackboneEvents = require('backbone-events-standalone');
 var classExtend = require('ampersand-class-extend');
 var isArray = require('is-array');
@@ -2230,7 +2289,7 @@ Collection.extend = classExtend;
 
 module.exports = Collection;
 
-},{"ampersand-class-extend":"/home/bbales2/modelEditor/node_modules/ampersand-collection/node_modules/ampersand-class-extend/ampersand-class-extend.js","backbone-events-standalone":"/home/bbales2/modelEditor/node_modules/ampersand-collection/node_modules/backbone-events-standalone/index.js","extend-object":"/home/bbales2/modelEditor/node_modules/ampersand-collection/node_modules/extend-object/extend-object.js","is-array":"/home/bbales2/modelEditor/node_modules/ampersand-collection/node_modules/is-array/index.js"}],"/home/bbales2/modelEditor/node_modules/ampersand-collection/node_modules/ampersand-class-extend/ampersand-class-extend.js":[function(require,module,exports){
+},{"ampersand-class-extend":"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/ampersand-collection/node_modules/ampersand-class-extend/ampersand-class-extend.js","backbone-events-standalone":"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/ampersand-collection/node_modules/backbone-events-standalone/index.js","extend-object":"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/ampersand-collection/node_modules/extend-object/extend-object.js","is-array":"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/ampersand-collection/node_modules/is-array/index.js"}],"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/ampersand-collection/node_modules/ampersand-class-extend/ampersand-class-extend.js":[function(require,module,exports){
 var objectExtend = require('extend-object');
 
 
@@ -2280,7 +2339,7 @@ var extend = function(protoProps) {
 // Expose the extend function
 module.exports = extend;
 
-},{"extend-object":"/home/bbales2/modelEditor/node_modules/ampersand-collection/node_modules/extend-object/extend-object.js"}],"/home/bbales2/modelEditor/node_modules/ampersand-collection/node_modules/backbone-events-standalone/backbone-events-standalone.js":[function(require,module,exports){
+},{"extend-object":"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/ampersand-collection/node_modules/extend-object/extend-object.js"}],"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/ampersand-collection/node_modules/backbone-events-standalone/backbone-events-standalone.js":[function(require,module,exports){
 /**
  * Standalone extraction of Backbone.Events, no external dependency required.
  * Degrades nicely when Backone/underscore are already available in the current
@@ -2548,10 +2607,10 @@ module.exports = extend;
   }
 })(this);
 
-},{}],"/home/bbales2/modelEditor/node_modules/ampersand-collection/node_modules/backbone-events-standalone/index.js":[function(require,module,exports){
+},{}],"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/ampersand-collection/node_modules/backbone-events-standalone/index.js":[function(require,module,exports){
 module.exports = require('./backbone-events-standalone');
 
-},{"./backbone-events-standalone":"/home/bbales2/modelEditor/node_modules/ampersand-collection/node_modules/backbone-events-standalone/backbone-events-standalone.js"}],"/home/bbales2/modelEditor/node_modules/ampersand-collection/node_modules/extend-object/extend-object.js":[function(require,module,exports){
+},{"./backbone-events-standalone":"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/ampersand-collection/node_modules/backbone-events-standalone/backbone-events-standalone.js"}],"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/ampersand-collection/node_modules/extend-object/extend-object.js":[function(require,module,exports){
 var arr = [];
 var each = arr.forEach;
 var slice = arr.slice;
@@ -2568,7 +2627,7 @@ module.exports = function(obj) {
     return obj;
 };
 
-},{}],"/home/bbales2/modelEditor/node_modules/ampersand-collection/node_modules/is-array/index.js":[function(require,module,exports){
+},{}],"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/ampersand-collection/node_modules/is-array/index.js":[function(require,module,exports){
 
 /**
  * isArray
@@ -2603,7 +2662,7 @@ module.exports = isArray || function (val) {
   return !! val && '[object Array]' == str.call(val);
 };
 
-},{}],"/home/bbales2/modelEditor/node_modules/ampersand-dom/ampersand-dom.js":[function(require,module,exports){
+},{}],"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/ampersand-dom/ampersand-dom.js":[function(require,module,exports){
 ;if (typeof window !== "undefined") {  window.ampersand = window.ampersand || {};  window.ampersand["ampersand-dom"] = window.ampersand["ampersand-dom"] || [];  window.ampersand["ampersand-dom"].push("1.2.7");}
 var dom = module.exports = {
     text: function (el, val) {
@@ -2723,7 +2782,7 @@ function hide (el) {
     el.style.display = 'none';
 }
 
-},{}],"/home/bbales2/modelEditor/node_modules/ampersand-form-view/ampersand-form-view.js":[function(require,module,exports){
+},{}],"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/ampersand-form-view/ampersand-form-view.js":[function(require,module,exports){
 ;if (typeof window !== "undefined") {  window.ampersand = window.ampersand || {};  window.ampersand["ampersand-form-view"] = window.ampersand["ampersand-form-view"] || [];  window.ampersand["ampersand-form-view"].push("2.2.0");}
 var BBEvents = require('backbone-events-standalone');
 var extend = require('extend-object');
@@ -2743,6 +2802,7 @@ function FormView(opts) {
 
     if (opts.data) this.data = opts.data;
     if (opts.model) this.model = opts.model;
+    if (opts.fields) this.fields = opts.model;
 
     this.clean = opts.clean || function (res) { return res; };
     this.valid = false;
@@ -2756,9 +2816,6 @@ function FormView(opts) {
     if (this.initialize) this.initialize.apply(this, arguments);
 
     this.render();
-
-    // add all our fields
-    (opts.fields || result(this, 'fields') || []).forEach(this.addField.bind(this));
 
     //defer till after returning from initialize
     setTimeout(function () {
@@ -2870,6 +2927,9 @@ extend(FormView.prototype, BBEvents, {
         this.handleSubmit = this.handleSubmit.bind(this);
         this.el.addEventListener('submit', this.handleSubmit, false);
         this.rendered = true;
+
+        // add all our fields
+        (result(this, 'fields') || []).forEach(this.addField.bind(this));
     }
 });
 
@@ -2886,13 +2946,11 @@ FormView.extend = function (obj) {
 
 module.exports = FormView;
 
-},{"backbone-events-standalone":"/home/bbales2/modelEditor/node_modules/ampersand-form-view/node_modules/backbone-events-standalone/index.js","extend-object":"/home/bbales2/modelEditor/node_modules/ampersand-form-view/node_modules/extend-object/extend-object.js"}],"/home/bbales2/modelEditor/node_modules/ampersand-form-view/node_modules/backbone-events-standalone/backbone-events-standalone.js":[function(require,module,exports){
-module.exports=require("/home/bbales2/modelEditor/node_modules/ampersand-collection/node_modules/backbone-events-standalone/backbone-events-standalone.js")
-},{"/home/bbales2/modelEditor/node_modules/ampersand-collection/node_modules/backbone-events-standalone/backbone-events-standalone.js":"/home/bbales2/modelEditor/node_modules/ampersand-collection/node_modules/backbone-events-standalone/backbone-events-standalone.js"}],"/home/bbales2/modelEditor/node_modules/ampersand-form-view/node_modules/backbone-events-standalone/index.js":[function(require,module,exports){
-module.exports=require("/home/bbales2/modelEditor/node_modules/ampersand-collection/node_modules/backbone-events-standalone/index.js")
-},{"/home/bbales2/modelEditor/node_modules/ampersand-collection/node_modules/backbone-events-standalone/index.js":"/home/bbales2/modelEditor/node_modules/ampersand-collection/node_modules/backbone-events-standalone/index.js"}],"/home/bbales2/modelEditor/node_modules/ampersand-form-view/node_modules/extend-object/extend-object.js":[function(require,module,exports){
-module.exports=require("/home/bbales2/modelEditor/node_modules/ampersand-collection/node_modules/extend-object/extend-object.js")
-},{"/home/bbales2/modelEditor/node_modules/ampersand-collection/node_modules/extend-object/extend-object.js":"/home/bbales2/modelEditor/node_modules/ampersand-collection/node_modules/extend-object/extend-object.js"}],"/home/bbales2/modelEditor/node_modules/ampersand-input-view/ampersand-input-view.js":[function(require,module,exports){
+},{"backbone-events-standalone":"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/ampersand-form-view/node_modules/backbone-events-standalone/index.js","extend-object":"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/ampersand-form-view/node_modules/extend-object/extend-object.js"}],"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/ampersand-form-view/node_modules/backbone-events-standalone/index.js":[function(require,module,exports){
+module.exports=require("/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/ampersand-collection/node_modules/backbone-events-standalone/index.js")
+},{"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/ampersand-collection/node_modules/backbone-events-standalone/index.js":"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/ampersand-collection/node_modules/backbone-events-standalone/index.js"}],"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/ampersand-form-view/node_modules/extend-object/extend-object.js":[function(require,module,exports){
+module.exports=require("/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/ampersand-collection/node_modules/extend-object/extend-object.js")
+},{"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/ampersand-collection/node_modules/extend-object/extend-object.js":"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/ampersand-collection/node_modules/extend-object/extend-object.js"}],"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/ampersand-input-view/ampersand-input-view.js":[function(require,module,exports){
 var View = require('ampersand-view');
 
 
@@ -3091,7 +3149,7 @@ module.exports = View.extend({
     }
 });
 
-},{"ampersand-view":"/home/bbales2/modelEditor/node_modules/ampersand-view/ampersand-view.js"}],"/home/bbales2/modelEditor/node_modules/ampersand-model/ampersand-model.js":[function(require,module,exports){
+},{"ampersand-view":"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/ampersand-view/ampersand-view.js"}],"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/ampersand-model/ampersand-model.js":[function(require,module,exports){
 ;if (typeof window !== "undefined") {  window.ampersand = window.ampersand || {};  window.ampersand["ampersand-model"] = window.ampersand["ampersand-model"] || [];  window.ampersand["ampersand-model"].push("4.0.3");}
 var State = require('ampersand-state');
 var _ = require('underscore');
@@ -3225,7 +3283,7 @@ var wrapError = function (model, options) {
 
 module.exports = Model;
 
-},{"ampersand-state":"/home/bbales2/modelEditor/node_modules/ampersand-state/ampersand-state.js","ampersand-sync":"/home/bbales2/modelEditor/node_modules/ampersand-model/node_modules/ampersand-sync/ampersand-sync.js","underscore":"/home/bbales2/modelEditor/node_modules/underscore/underscore.js"}],"/home/bbales2/modelEditor/node_modules/ampersand-model/node_modules/ampersand-sync/ampersand-sync.js":[function(require,module,exports){
+},{"ampersand-state":"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/ampersand-state/ampersand-state.js","ampersand-sync":"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/ampersand-model/node_modules/ampersand-sync/ampersand-sync.js","underscore":"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/underscore/underscore.js"}],"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/ampersand-model/node_modules/ampersand-sync/ampersand-sync.js":[function(require,module,exports){
 var _ = require('underscore');
 var xhr = require('xhr');
 var qs = require('qs');
@@ -3346,10 +3404,10 @@ var methodMap = {
     'read':   'GET'
 };
 
-},{"qs":"/home/bbales2/modelEditor/node_modules/ampersand-model/node_modules/ampersand-sync/node_modules/qs/index.js","underscore":"/home/bbales2/modelEditor/node_modules/ampersand-model/node_modules/ampersand-sync/node_modules/underscore/underscore.js","xhr":"/home/bbales2/modelEditor/node_modules/ampersand-model/node_modules/ampersand-sync/node_modules/xhr/index.js"}],"/home/bbales2/modelEditor/node_modules/ampersand-model/node_modules/ampersand-sync/node_modules/qs/index.js":[function(require,module,exports){
+},{"qs":"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/ampersand-model/node_modules/ampersand-sync/node_modules/qs/index.js","underscore":"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/ampersand-model/node_modules/ampersand-sync/node_modules/underscore/underscore.js","xhr":"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/ampersand-model/node_modules/ampersand-sync/node_modules/xhr/index.js"}],"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/ampersand-model/node_modules/ampersand-sync/node_modules/qs/index.js":[function(require,module,exports){
 module.exports = require('./lib');
 
-},{"./lib":"/home/bbales2/modelEditor/node_modules/ampersand-model/node_modules/ampersand-sync/node_modules/qs/lib/index.js"}],"/home/bbales2/modelEditor/node_modules/ampersand-model/node_modules/ampersand-sync/node_modules/qs/lib/index.js":[function(require,module,exports){
+},{"./lib":"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/ampersand-model/node_modules/ampersand-sync/node_modules/qs/lib/index.js"}],"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/ampersand-model/node_modules/ampersand-sync/node_modules/qs/lib/index.js":[function(require,module,exports){
 // Load modules
 
 var Stringify = require('./stringify');
@@ -3366,7 +3424,7 @@ module.exports = {
     parse: Parse
 };
 
-},{"./parse":"/home/bbales2/modelEditor/node_modules/ampersand-model/node_modules/ampersand-sync/node_modules/qs/lib/parse.js","./stringify":"/home/bbales2/modelEditor/node_modules/ampersand-model/node_modules/ampersand-sync/node_modules/qs/lib/stringify.js"}],"/home/bbales2/modelEditor/node_modules/ampersand-model/node_modules/ampersand-sync/node_modules/qs/lib/parse.js":[function(require,module,exports){
+},{"./parse":"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/ampersand-model/node_modules/ampersand-sync/node_modules/qs/lib/parse.js","./stringify":"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/ampersand-model/node_modules/ampersand-sync/node_modules/qs/lib/stringify.js"}],"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/ampersand-model/node_modules/ampersand-sync/node_modules/qs/lib/parse.js":[function(require,module,exports){
 // Load modules
 
 var Utils = require('./utils');
@@ -3523,7 +3581,7 @@ module.exports = function (str, depth, delimiter) {
     return Utils.compact(obj);
 };
 
-},{"./utils":"/home/bbales2/modelEditor/node_modules/ampersand-model/node_modules/ampersand-sync/node_modules/qs/lib/utils.js"}],"/home/bbales2/modelEditor/node_modules/ampersand-model/node_modules/ampersand-sync/node_modules/qs/lib/stringify.js":[function(require,module,exports){
+},{"./utils":"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/ampersand-model/node_modules/ampersand-sync/node_modules/qs/lib/utils.js"}],"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/ampersand-model/node_modules/ampersand-sync/node_modules/qs/lib/stringify.js":[function(require,module,exports){
 (function (Buffer){
 // Load modules
 
@@ -3582,7 +3640,7 @@ module.exports = function (obj, delimiter) {
 };
 
 }).call(this,require("buffer").Buffer)
-},{"buffer":"/home/bbales2/modelEditor/node_modules/watchify/node_modules/browserify/node_modules/buffer/index.js"}],"/home/bbales2/modelEditor/node_modules/ampersand-model/node_modules/ampersand-sync/node_modules/qs/lib/utils.js":[function(require,module,exports){
+},{"buffer":"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/watchify/node_modules/browserify/node_modules/buffer/index.js"}],"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/ampersand-model/node_modules/ampersand-sync/node_modules/qs/lib/utils.js":[function(require,module,exports){
 (function (Buffer){
 // Load modules
 
@@ -3719,7 +3777,7 @@ exports.compact = function (obj) {
 };
 
 }).call(this,require("buffer").Buffer)
-},{"buffer":"/home/bbales2/modelEditor/node_modules/watchify/node_modules/browserify/node_modules/buffer/index.js"}],"/home/bbales2/modelEditor/node_modules/ampersand-model/node_modules/ampersand-sync/node_modules/underscore/underscore.js":[function(require,module,exports){
+},{"buffer":"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/watchify/node_modules/browserify/node_modules/buffer/index.js"}],"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/ampersand-model/node_modules/ampersand-sync/node_modules/underscore/underscore.js":[function(require,module,exports){
 //     Underscore.js 1.6.0
 //     http://underscorejs.org
 //     (c) 2009-2014 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
@@ -5064,7 +5122,7 @@ exports.compact = function (obj) {
   }
 }).call(this);
 
-},{}],"/home/bbales2/modelEditor/node_modules/ampersand-model/node_modules/ampersand-sync/node_modules/xhr/index.js":[function(require,module,exports){
+},{}],"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/ampersand-model/node_modules/ampersand-sync/node_modules/xhr/index.js":[function(require,module,exports){
 var window = require("global/window")
 var once = require("once")
 var parseHeaders = require('parse-headers')
@@ -5243,7 +5301,7 @@ function createXHR(options, callback) {
 
 function noop() {}
 
-},{"global/window":"/home/bbales2/modelEditor/node_modules/ampersand-model/node_modules/ampersand-sync/node_modules/xhr/node_modules/global/window.js","once":"/home/bbales2/modelEditor/node_modules/ampersand-model/node_modules/ampersand-sync/node_modules/xhr/node_modules/once/once.js","parse-headers":"/home/bbales2/modelEditor/node_modules/ampersand-model/node_modules/ampersand-sync/node_modules/xhr/node_modules/parse-headers/parse-headers.js"}],"/home/bbales2/modelEditor/node_modules/ampersand-model/node_modules/ampersand-sync/node_modules/xhr/node_modules/global/window.js":[function(require,module,exports){
+},{"global/window":"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/ampersand-model/node_modules/ampersand-sync/node_modules/xhr/node_modules/global/window.js","once":"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/ampersand-model/node_modules/ampersand-sync/node_modules/xhr/node_modules/once/once.js","parse-headers":"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/ampersand-model/node_modules/ampersand-sync/node_modules/xhr/node_modules/parse-headers/parse-headers.js"}],"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/ampersand-model/node_modules/ampersand-sync/node_modules/xhr/node_modules/global/window.js":[function(require,module,exports){
 (function (global){
 if (typeof window !== "undefined") {
     module.exports = window;
@@ -5256,7 +5314,7 @@ if (typeof window !== "undefined") {
 }
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],"/home/bbales2/modelEditor/node_modules/ampersand-model/node_modules/ampersand-sync/node_modules/xhr/node_modules/once/once.js":[function(require,module,exports){
+},{}],"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/ampersand-model/node_modules/ampersand-sync/node_modules/xhr/node_modules/once/once.js":[function(require,module,exports){
 module.exports = once
 
 once.proto = once(function () {
@@ -5277,7 +5335,7 @@ function once (fn) {
   }
 }
 
-},{}],"/home/bbales2/modelEditor/node_modules/ampersand-model/node_modules/ampersand-sync/node_modules/xhr/node_modules/parse-headers/node_modules/for-each/index.js":[function(require,module,exports){
+},{}],"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/ampersand-model/node_modules/ampersand-sync/node_modules/xhr/node_modules/parse-headers/node_modules/for-each/index.js":[function(require,module,exports){
 var isFunction = require('is-function')
 
 module.exports = forEach
@@ -5325,7 +5383,7 @@ function forEachObject(object, iterator, context) {
     }
 }
 
-},{"is-function":"/home/bbales2/modelEditor/node_modules/ampersand-model/node_modules/ampersand-sync/node_modules/xhr/node_modules/parse-headers/node_modules/for-each/node_modules/is-function/index.js"}],"/home/bbales2/modelEditor/node_modules/ampersand-model/node_modules/ampersand-sync/node_modules/xhr/node_modules/parse-headers/node_modules/for-each/node_modules/is-function/index.js":[function(require,module,exports){
+},{"is-function":"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/ampersand-model/node_modules/ampersand-sync/node_modules/xhr/node_modules/parse-headers/node_modules/for-each/node_modules/is-function/index.js"}],"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/ampersand-model/node_modules/ampersand-sync/node_modules/xhr/node_modules/parse-headers/node_modules/for-each/node_modules/is-function/index.js":[function(require,module,exports){
 module.exports = isFunction
 
 var toString = Object.prototype.toString
@@ -5342,7 +5400,7 @@ function isFunction (fn) {
       fn === window.prompt))
 };
 
-},{}],"/home/bbales2/modelEditor/node_modules/ampersand-model/node_modules/ampersand-sync/node_modules/xhr/node_modules/parse-headers/node_modules/trim/index.js":[function(require,module,exports){
+},{}],"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/ampersand-model/node_modules/ampersand-sync/node_modules/xhr/node_modules/parse-headers/node_modules/trim/index.js":[function(require,module,exports){
 
 exports = module.exports = trim;
 
@@ -5358,7 +5416,7 @@ exports.right = function(str){
   return str.replace(/\s*$/, '');
 };
 
-},{}],"/home/bbales2/modelEditor/node_modules/ampersand-model/node_modules/ampersand-sync/node_modules/xhr/node_modules/parse-headers/parse-headers.js":[function(require,module,exports){
+},{}],"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/ampersand-model/node_modules/ampersand-sync/node_modules/xhr/node_modules/parse-headers/parse-headers.js":[function(require,module,exports){
 var trim = require('trim')
   , forEach = require('for-each')
   , isArray = function(arg) {
@@ -5390,7 +5448,7 @@ module.exports = function (headers) {
 
   return result
 }
-},{"for-each":"/home/bbales2/modelEditor/node_modules/ampersand-model/node_modules/ampersand-sync/node_modules/xhr/node_modules/parse-headers/node_modules/for-each/index.js","trim":"/home/bbales2/modelEditor/node_modules/ampersand-model/node_modules/ampersand-sync/node_modules/xhr/node_modules/parse-headers/node_modules/trim/index.js"}],"/home/bbales2/modelEditor/node_modules/ampersand-rest-collection/ampersand-rest-collection.js":[function(require,module,exports){
+},{"for-each":"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/ampersand-model/node_modules/ampersand-sync/node_modules/xhr/node_modules/parse-headers/node_modules/for-each/index.js","trim":"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/ampersand-model/node_modules/ampersand-sync/node_modules/xhr/node_modules/parse-headers/node_modules/trim/index.js"}],"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/ampersand-rest-collection/ampersand-rest-collection.js":[function(require,module,exports){
 ;if (typeof window !== "undefined") {  window.ampersand = window.ampersand || {};  window.ampersand["ampersand-rest-collection"] = window.ampersand["ampersand-rest-collection"] || [];  window.ampersand["ampersand-rest-collection"].push("2.0.4");}
 var Collection = require('ampersand-collection');
 var underscoreMixin = require('ampersand-collection-underscore-mixin');
@@ -5399,7 +5457,7 @@ var restMixins = require('ampersand-collection-rest-mixin');
 
 module.exports = Collection.extend(underscoreMixin, restMixins);
 
-},{"ampersand-collection":"/home/bbales2/modelEditor/node_modules/ampersand-collection/ampersand-collection.js","ampersand-collection-rest-mixin":"/home/bbales2/modelEditor/node_modules/ampersand-rest-collection/node_modules/ampersand-collection-rest-mixin/ampersand-collection-rest-mixin.js","ampersand-collection-underscore-mixin":"/home/bbales2/modelEditor/node_modules/ampersand-rest-collection/node_modules/ampersand-collection-underscore-mixin/ampersand-collection-underscore-mixin.js"}],"/home/bbales2/modelEditor/node_modules/ampersand-rest-collection/node_modules/ampersand-collection-rest-mixin/ampersand-collection-rest-mixin.js":[function(require,module,exports){
+},{"ampersand-collection":"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/ampersand-collection/ampersand-collection.js","ampersand-collection-rest-mixin":"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/ampersand-rest-collection/node_modules/ampersand-collection-rest-mixin/ampersand-collection-rest-mixin.js","ampersand-collection-underscore-mixin":"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/ampersand-rest-collection/node_modules/ampersand-collection-underscore-mixin/ampersand-collection-underscore-mixin.js"}],"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/ampersand-rest-collection/node_modules/ampersand-collection-rest-mixin/ampersand-collection-rest-mixin.js":[function(require,module,exports){
 ;if (typeof window !== "undefined") {  window.ampersand = window.ampersand || {};  window.ampersand["ampersand-collection-rest-mixin"] = window.ampersand["ampersand-collection-rest-mixin"] || [];  window.ampersand["ampersand-collection-rest-mixin"].push("3.0.1");}
 var sync = require('ampersand-sync');
 var extend = require('extend-object');
@@ -5501,37 +5559,11 @@ module.exports = {
     }
 };
 
-},{"ampersand-sync":"/home/bbales2/modelEditor/node_modules/ampersand-rest-collection/node_modules/ampersand-collection-rest-mixin/node_modules/ampersand-sync/ampersand-sync.js","extend-object":"/home/bbales2/modelEditor/node_modules/ampersand-rest-collection/node_modules/ampersand-collection-rest-mixin/node_modules/extend-object/extend-object.js"}],"/home/bbales2/modelEditor/node_modules/ampersand-rest-collection/node_modules/ampersand-collection-rest-mixin/node_modules/ampersand-sync/ampersand-sync.js":[function(require,module,exports){
-module.exports=require("/home/bbales2/modelEditor/node_modules/ampersand-model/node_modules/ampersand-sync/ampersand-sync.js")
-},{"/home/bbales2/modelEditor/node_modules/ampersand-model/node_modules/ampersand-sync/ampersand-sync.js":"/home/bbales2/modelEditor/node_modules/ampersand-model/node_modules/ampersand-sync/ampersand-sync.js"}],"/home/bbales2/modelEditor/node_modules/ampersand-rest-collection/node_modules/ampersand-collection-rest-mixin/node_modules/ampersand-sync/node_modules/qs/index.js":[function(require,module,exports){
-module.exports=require("/home/bbales2/modelEditor/node_modules/ampersand-model/node_modules/ampersand-sync/node_modules/qs/index.js")
-},{"/home/bbales2/modelEditor/node_modules/ampersand-model/node_modules/ampersand-sync/node_modules/qs/index.js":"/home/bbales2/modelEditor/node_modules/ampersand-model/node_modules/ampersand-sync/node_modules/qs/index.js"}],"/home/bbales2/modelEditor/node_modules/ampersand-rest-collection/node_modules/ampersand-collection-rest-mixin/node_modules/ampersand-sync/node_modules/qs/lib/index.js":[function(require,module,exports){
-module.exports=require("/home/bbales2/modelEditor/node_modules/ampersand-model/node_modules/ampersand-sync/node_modules/qs/lib/index.js")
-},{"/home/bbales2/modelEditor/node_modules/ampersand-model/node_modules/ampersand-sync/node_modules/qs/lib/index.js":"/home/bbales2/modelEditor/node_modules/ampersand-model/node_modules/ampersand-sync/node_modules/qs/lib/index.js"}],"/home/bbales2/modelEditor/node_modules/ampersand-rest-collection/node_modules/ampersand-collection-rest-mixin/node_modules/ampersand-sync/node_modules/qs/lib/parse.js":[function(require,module,exports){
-module.exports=require("/home/bbales2/modelEditor/node_modules/ampersand-model/node_modules/ampersand-sync/node_modules/qs/lib/parse.js")
-},{"/home/bbales2/modelEditor/node_modules/ampersand-model/node_modules/ampersand-sync/node_modules/qs/lib/parse.js":"/home/bbales2/modelEditor/node_modules/ampersand-model/node_modules/ampersand-sync/node_modules/qs/lib/parse.js"}],"/home/bbales2/modelEditor/node_modules/ampersand-rest-collection/node_modules/ampersand-collection-rest-mixin/node_modules/ampersand-sync/node_modules/qs/lib/stringify.js":[function(require,module,exports){
-module.exports=require("/home/bbales2/modelEditor/node_modules/ampersand-model/node_modules/ampersand-sync/node_modules/qs/lib/stringify.js")
-},{"/home/bbales2/modelEditor/node_modules/ampersand-model/node_modules/ampersand-sync/node_modules/qs/lib/stringify.js":"/home/bbales2/modelEditor/node_modules/ampersand-model/node_modules/ampersand-sync/node_modules/qs/lib/stringify.js"}],"/home/bbales2/modelEditor/node_modules/ampersand-rest-collection/node_modules/ampersand-collection-rest-mixin/node_modules/ampersand-sync/node_modules/qs/lib/utils.js":[function(require,module,exports){
-module.exports=require("/home/bbales2/modelEditor/node_modules/ampersand-model/node_modules/ampersand-sync/node_modules/qs/lib/utils.js")
-},{"/home/bbales2/modelEditor/node_modules/ampersand-model/node_modules/ampersand-sync/node_modules/qs/lib/utils.js":"/home/bbales2/modelEditor/node_modules/ampersand-model/node_modules/ampersand-sync/node_modules/qs/lib/utils.js"}],"/home/bbales2/modelEditor/node_modules/ampersand-rest-collection/node_modules/ampersand-collection-rest-mixin/node_modules/ampersand-sync/node_modules/underscore/underscore.js":[function(require,module,exports){
-module.exports=require("/home/bbales2/modelEditor/node_modules/ampersand-model/node_modules/ampersand-sync/node_modules/underscore/underscore.js")
-},{"/home/bbales2/modelEditor/node_modules/ampersand-model/node_modules/ampersand-sync/node_modules/underscore/underscore.js":"/home/bbales2/modelEditor/node_modules/ampersand-model/node_modules/ampersand-sync/node_modules/underscore/underscore.js"}],"/home/bbales2/modelEditor/node_modules/ampersand-rest-collection/node_modules/ampersand-collection-rest-mixin/node_modules/ampersand-sync/node_modules/xhr/index.js":[function(require,module,exports){
-module.exports=require("/home/bbales2/modelEditor/node_modules/ampersand-model/node_modules/ampersand-sync/node_modules/xhr/index.js")
-},{"/home/bbales2/modelEditor/node_modules/ampersand-model/node_modules/ampersand-sync/node_modules/xhr/index.js":"/home/bbales2/modelEditor/node_modules/ampersand-model/node_modules/ampersand-sync/node_modules/xhr/index.js"}],"/home/bbales2/modelEditor/node_modules/ampersand-rest-collection/node_modules/ampersand-collection-rest-mixin/node_modules/ampersand-sync/node_modules/xhr/node_modules/global/window.js":[function(require,module,exports){
-module.exports=require("/home/bbales2/modelEditor/node_modules/ampersand-model/node_modules/ampersand-sync/node_modules/xhr/node_modules/global/window.js")
-},{"/home/bbales2/modelEditor/node_modules/ampersand-model/node_modules/ampersand-sync/node_modules/xhr/node_modules/global/window.js":"/home/bbales2/modelEditor/node_modules/ampersand-model/node_modules/ampersand-sync/node_modules/xhr/node_modules/global/window.js"}],"/home/bbales2/modelEditor/node_modules/ampersand-rest-collection/node_modules/ampersand-collection-rest-mixin/node_modules/ampersand-sync/node_modules/xhr/node_modules/once/once.js":[function(require,module,exports){
-module.exports=require("/home/bbales2/modelEditor/node_modules/ampersand-model/node_modules/ampersand-sync/node_modules/xhr/node_modules/once/once.js")
-},{"/home/bbales2/modelEditor/node_modules/ampersand-model/node_modules/ampersand-sync/node_modules/xhr/node_modules/once/once.js":"/home/bbales2/modelEditor/node_modules/ampersand-model/node_modules/ampersand-sync/node_modules/xhr/node_modules/once/once.js"}],"/home/bbales2/modelEditor/node_modules/ampersand-rest-collection/node_modules/ampersand-collection-rest-mixin/node_modules/ampersand-sync/node_modules/xhr/node_modules/parse-headers/node_modules/for-each/index.js":[function(require,module,exports){
-module.exports=require("/home/bbales2/modelEditor/node_modules/ampersand-model/node_modules/ampersand-sync/node_modules/xhr/node_modules/parse-headers/node_modules/for-each/index.js")
-},{"/home/bbales2/modelEditor/node_modules/ampersand-model/node_modules/ampersand-sync/node_modules/xhr/node_modules/parse-headers/node_modules/for-each/index.js":"/home/bbales2/modelEditor/node_modules/ampersand-model/node_modules/ampersand-sync/node_modules/xhr/node_modules/parse-headers/node_modules/for-each/index.js"}],"/home/bbales2/modelEditor/node_modules/ampersand-rest-collection/node_modules/ampersand-collection-rest-mixin/node_modules/ampersand-sync/node_modules/xhr/node_modules/parse-headers/node_modules/for-each/node_modules/is-function/index.js":[function(require,module,exports){
-module.exports=require("/home/bbales2/modelEditor/node_modules/ampersand-model/node_modules/ampersand-sync/node_modules/xhr/node_modules/parse-headers/node_modules/for-each/node_modules/is-function/index.js")
-},{"/home/bbales2/modelEditor/node_modules/ampersand-model/node_modules/ampersand-sync/node_modules/xhr/node_modules/parse-headers/node_modules/for-each/node_modules/is-function/index.js":"/home/bbales2/modelEditor/node_modules/ampersand-model/node_modules/ampersand-sync/node_modules/xhr/node_modules/parse-headers/node_modules/for-each/node_modules/is-function/index.js"}],"/home/bbales2/modelEditor/node_modules/ampersand-rest-collection/node_modules/ampersand-collection-rest-mixin/node_modules/ampersand-sync/node_modules/xhr/node_modules/parse-headers/node_modules/trim/index.js":[function(require,module,exports){
-module.exports=require("/home/bbales2/modelEditor/node_modules/ampersand-model/node_modules/ampersand-sync/node_modules/xhr/node_modules/parse-headers/node_modules/trim/index.js")
-},{"/home/bbales2/modelEditor/node_modules/ampersand-model/node_modules/ampersand-sync/node_modules/xhr/node_modules/parse-headers/node_modules/trim/index.js":"/home/bbales2/modelEditor/node_modules/ampersand-model/node_modules/ampersand-sync/node_modules/xhr/node_modules/parse-headers/node_modules/trim/index.js"}],"/home/bbales2/modelEditor/node_modules/ampersand-rest-collection/node_modules/ampersand-collection-rest-mixin/node_modules/ampersand-sync/node_modules/xhr/node_modules/parse-headers/parse-headers.js":[function(require,module,exports){
-module.exports=require("/home/bbales2/modelEditor/node_modules/ampersand-model/node_modules/ampersand-sync/node_modules/xhr/node_modules/parse-headers/parse-headers.js")
-},{"/home/bbales2/modelEditor/node_modules/ampersand-model/node_modules/ampersand-sync/node_modules/xhr/node_modules/parse-headers/parse-headers.js":"/home/bbales2/modelEditor/node_modules/ampersand-model/node_modules/ampersand-sync/node_modules/xhr/node_modules/parse-headers/parse-headers.js"}],"/home/bbales2/modelEditor/node_modules/ampersand-rest-collection/node_modules/ampersand-collection-rest-mixin/node_modules/extend-object/extend-object.js":[function(require,module,exports){
-module.exports=require("/home/bbales2/modelEditor/node_modules/ampersand-collection/node_modules/extend-object/extend-object.js")
-},{"/home/bbales2/modelEditor/node_modules/ampersand-collection/node_modules/extend-object/extend-object.js":"/home/bbales2/modelEditor/node_modules/ampersand-collection/node_modules/extend-object/extend-object.js"}],"/home/bbales2/modelEditor/node_modules/ampersand-rest-collection/node_modules/ampersand-collection-underscore-mixin/ampersand-collection-underscore-mixin.js":[function(require,module,exports){
+},{"ampersand-sync":"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/ampersand-rest-collection/node_modules/ampersand-collection-rest-mixin/node_modules/ampersand-sync/ampersand-sync.js","extend-object":"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/ampersand-rest-collection/node_modules/ampersand-collection-rest-mixin/node_modules/extend-object/extend-object.js"}],"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/ampersand-rest-collection/node_modules/ampersand-collection-rest-mixin/node_modules/ampersand-sync/ampersand-sync.js":[function(require,module,exports){
+module.exports=require("/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/ampersand-model/node_modules/ampersand-sync/ampersand-sync.js")
+},{"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/ampersand-model/node_modules/ampersand-sync/ampersand-sync.js":"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/ampersand-model/node_modules/ampersand-sync/ampersand-sync.js"}],"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/ampersand-rest-collection/node_modules/ampersand-collection-rest-mixin/node_modules/extend-object/extend-object.js":[function(require,module,exports){
+module.exports=require("/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/ampersand-form-view/node_modules/extend-object/extend-object.js")
+},{"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/ampersand-form-view/node_modules/extend-object/extend-object.js":"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/ampersand-form-view/node_modules/extend-object/extend-object.js"}],"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/ampersand-rest-collection/node_modules/ampersand-collection-underscore-mixin/ampersand-collection-underscore-mixin.js":[function(require,module,exports){
 ;if (typeof window !== "undefined") {  window.ampersand = window.ampersand || {};  window.ampersand["ampersand-collection-underscore-mixin"] = window.ampersand["ampersand-collection-underscore-mixin"] || [];  window.ampersand["ampersand-collection-underscore-mixin"].push("1.0.3");}
 var _ = require('underscore');
 var slice = [].slice;
@@ -5598,7 +5630,7 @@ mixins.pluck = function (attr) {
 
 module.exports = mixins;
 
-},{"underscore":"/home/bbales2/modelEditor/node_modules/underscore/underscore.js"}],"/home/bbales2/modelEditor/node_modules/ampersand-select-view/ampersand-select-view.js":[function(require,module,exports){
+},{"underscore":"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/underscore/underscore.js"}],"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/ampersand-select-view/ampersand-select-view.js":[function(require,module,exports){
 ;if (typeof window !== "undefined") {  window.ampersand = window.ampersand || {};  window.ampersand["ampersand-select-view"] = window.ampersand["ampersand-select-view"] || [];  window.ampersand["ampersand-select-view"].push("2.3.0");}
 var domify = require('domify');
 var dom = require('ampersand-dom');
@@ -5889,7 +5921,7 @@ function createOption (value, text) {
 
 module.exports = SelectView;
 
-},{"ampersand-dom":"/home/bbales2/modelEditor/node_modules/ampersand-dom/ampersand-dom.js","domify":"/home/bbales2/modelEditor/node_modules/domify/index.js","matches-selector":"/home/bbales2/modelEditor/node_modules/ampersand-select-view/node_modules/matches-selector/index.js"}],"/home/bbales2/modelEditor/node_modules/ampersand-select-view/node_modules/matches-selector/index.js":[function(require,module,exports){
+},{"ampersand-dom":"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/ampersand-dom/ampersand-dom.js","domify":"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/domify/index.js","matches-selector":"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/ampersand-select-view/node_modules/matches-selector/index.js"}],"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/ampersand-select-view/node_modules/matches-selector/index.js":[function(require,module,exports){
 'use strict';
 
 var proto = Element.prototype;
@@ -5919,7 +5951,7 @@ function match(el, selector) {
   }
   return false;
 }
-},{}],"/home/bbales2/modelEditor/node_modules/ampersand-state/ampersand-state.js":[function(require,module,exports){
+},{}],"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/ampersand-state/ampersand-state.js":[function(require,module,exports){
 ;if (typeof window !== "undefined") {  window.ampersand = window.ampersand || {};  window.ampersand["ampersand-state"] = window.ampersand["ampersand-state"] || [];  window.ampersand["ampersand-state"].push("4.4.4");}
 var _ = require('underscore');
 var BBEvents = require('backbone-events-standalone');
@@ -6695,7 +6727,7 @@ Base.extend = extend;
 // Our main exports
 module.exports = Base;
 
-},{"array-next":"/home/bbales2/modelEditor/node_modules/ampersand-state/node_modules/array-next/array-next.js","backbone-events-standalone":"/home/bbales2/modelEditor/node_modules/ampersand-state/node_modules/backbone-events-standalone/index.js","key-tree-store":"/home/bbales2/modelEditor/node_modules/ampersand-state/node_modules/key-tree-store/key-tree-store.js","underscore":"/home/bbales2/modelEditor/node_modules/underscore/underscore.js"}],"/home/bbales2/modelEditor/node_modules/ampersand-state/node_modules/array-next/array-next.js":[function(require,module,exports){
+},{"array-next":"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/ampersand-state/node_modules/array-next/array-next.js","backbone-events-standalone":"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/ampersand-state/node_modules/backbone-events-standalone/index.js","key-tree-store":"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/ampersand-state/node_modules/key-tree-store/key-tree-store.js","underscore":"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/underscore/underscore.js"}],"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/ampersand-state/node_modules/array-next/array-next.js":[function(require,module,exports){
 module.exports = function arrayNext(array, currentItem) {
     var len = array.length;
     var newIndex = array.indexOf(currentItem) + 1;
@@ -6703,11 +6735,9 @@ module.exports = function arrayNext(array, currentItem) {
     return array[newIndex];
 };
 
-},{}],"/home/bbales2/modelEditor/node_modules/ampersand-state/node_modules/backbone-events-standalone/backbone-events-standalone.js":[function(require,module,exports){
-module.exports=require("/home/bbales2/modelEditor/node_modules/ampersand-collection/node_modules/backbone-events-standalone/backbone-events-standalone.js")
-},{"/home/bbales2/modelEditor/node_modules/ampersand-collection/node_modules/backbone-events-standalone/backbone-events-standalone.js":"/home/bbales2/modelEditor/node_modules/ampersand-collection/node_modules/backbone-events-standalone/backbone-events-standalone.js"}],"/home/bbales2/modelEditor/node_modules/ampersand-state/node_modules/backbone-events-standalone/index.js":[function(require,module,exports){
-module.exports=require("/home/bbales2/modelEditor/node_modules/ampersand-collection/node_modules/backbone-events-standalone/index.js")
-},{"/home/bbales2/modelEditor/node_modules/ampersand-collection/node_modules/backbone-events-standalone/index.js":"/home/bbales2/modelEditor/node_modules/ampersand-collection/node_modules/backbone-events-standalone/index.js"}],"/home/bbales2/modelEditor/node_modules/ampersand-state/node_modules/key-tree-store/key-tree-store.js":[function(require,module,exports){
+},{}],"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/ampersand-state/node_modules/backbone-events-standalone/index.js":[function(require,module,exports){
+module.exports=require("/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/ampersand-form-view/node_modules/backbone-events-standalone/index.js")
+},{"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/ampersand-form-view/node_modules/backbone-events-standalone/index.js":"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/ampersand-form-view/node_modules/backbone-events-standalone/index.js"}],"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/ampersand-state/node_modules/key-tree-store/key-tree-store.js":[function(require,module,exports){
 function KeyTreeStore() {
     this.storage = {};
 }
@@ -6748,7 +6778,7 @@ KeyTreeStore.prototype.get = function (keypath) {
 
 module.exports = KeyTreeStore;
 
-},{}],"/home/bbales2/modelEditor/node_modules/ampersand-view/ampersand-view.js":[function(require,module,exports){
+},{}],"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/ampersand-view/ampersand-view.js":[function(require,module,exports){
 ;if (typeof window !== "undefined") {  window.ampersand = window.ampersand || {};  window.ampersand["ampersand-view"] = window.ampersand["ampersand-view"] || [];  window.ampersand["ampersand-view"].push("7.2.0");}
 var State = require('ampersand-state');
 var CollectionView = require('ampersand-collection-view');
@@ -7118,7 +7148,7 @@ _.extend(View.prototype, {
 View.extend = BaseState.extend;
 module.exports = View;
 
-},{"ampersand-collection-view":"/home/bbales2/modelEditor/node_modules/ampersand-view/node_modules/ampersand-collection-view/ampersand-collection-view.js","ampersand-dom-bindings":"/home/bbales2/modelEditor/node_modules/ampersand-view/node_modules/ampersand-dom-bindings/ampersand-dom-bindings.js","ampersand-state":"/home/bbales2/modelEditor/node_modules/ampersand-state/ampersand-state.js","domify":"/home/bbales2/modelEditor/node_modules/domify/index.js","events-mixin":"/home/bbales2/modelEditor/node_modules/ampersand-view/node_modules/events-mixin/index.js","get-object-path":"/home/bbales2/modelEditor/node_modules/ampersand-view/node_modules/get-object-path/index.js","matches-selector":"/home/bbales2/modelEditor/node_modules/ampersand-view/node_modules/matches-selector/index.js","underscore":"/home/bbales2/modelEditor/node_modules/ampersand-view/node_modules/underscore/underscore.js"}],"/home/bbales2/modelEditor/node_modules/ampersand-view/node_modules/ampersand-collection-view/ampersand-collection-view.js":[function(require,module,exports){
+},{"ampersand-collection-view":"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/ampersand-view/node_modules/ampersand-collection-view/ampersand-collection-view.js","ampersand-dom-bindings":"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/ampersand-view/node_modules/ampersand-dom-bindings/ampersand-dom-bindings.js","ampersand-state":"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/ampersand-state/ampersand-state.js","domify":"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/domify/index.js","events-mixin":"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/ampersand-view/node_modules/events-mixin/index.js","get-object-path":"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/ampersand-view/node_modules/get-object-path/index.js","matches-selector":"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/ampersand-view/node_modules/matches-selector/index.js","underscore":"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/ampersand-view/node_modules/underscore/underscore.js"}],"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/ampersand-view/node_modules/ampersand-collection-view/ampersand-collection-view.js":[function(require,module,exports){
 ;if (typeof window !== "undefined") {  window.ampersand = window.ampersand || {};  window.ampersand["ampersand-collection-view"] = window.ampersand["ampersand-collection-view"] || [];  window.ampersand["ampersand-collection-view"].push("1.2.0");}
 var _ = require('underscore');
 var BBEvents = require('backbone-events-standalone');
@@ -7279,292 +7309,13 @@ CollectionView.extend = ampExtend;
 
 module.exports = CollectionView;
 
-},{"ampersand-class-extend":"/home/bbales2/modelEditor/node_modules/ampersand-view/node_modules/ampersand-collection-view/node_modules/ampersand-class-extend/ampersand-class-extend.js","backbone-events-standalone":"/home/bbales2/modelEditor/node_modules/ampersand-view/node_modules/ampersand-collection-view/node_modules/backbone-events-standalone/index.js","underscore":"/home/bbales2/modelEditor/node_modules/ampersand-view/node_modules/underscore/underscore.js"}],"/home/bbales2/modelEditor/node_modules/ampersand-view/node_modules/ampersand-collection-view/node_modules/ampersand-class-extend/ampersand-class-extend.js":[function(require,module,exports){
-module.exports=require("/home/bbales2/modelEditor/node_modules/ampersand-collection/node_modules/ampersand-class-extend/ampersand-class-extend.js")
-},{"/home/bbales2/modelEditor/node_modules/ampersand-collection/node_modules/ampersand-class-extend/ampersand-class-extend.js":"/home/bbales2/modelEditor/node_modules/ampersand-collection/node_modules/ampersand-class-extend/ampersand-class-extend.js"}],"/home/bbales2/modelEditor/node_modules/ampersand-view/node_modules/ampersand-collection-view/node_modules/ampersand-class-extend/node_modules/extend-object/extend-object.js":[function(require,module,exports){
-module.exports=require("/home/bbales2/modelEditor/node_modules/ampersand-collection/node_modules/extend-object/extend-object.js")
-},{"/home/bbales2/modelEditor/node_modules/ampersand-collection/node_modules/extend-object/extend-object.js":"/home/bbales2/modelEditor/node_modules/ampersand-collection/node_modules/extend-object/extend-object.js"}],"/home/bbales2/modelEditor/node_modules/ampersand-view/node_modules/ampersand-collection-view/node_modules/backbone-events-standalone/backbone-events-standalone.js":[function(require,module,exports){
-/**
- * Standalone extraction of Backbone.Events, no external dependency required.
- * Degrades nicely when Backone/underscore are already available in the current
- * global context.
- *
- * Note that docs suggest to use underscore's `_.extend()` method to add Events
- * support to some given object. A `mixin()` method has been added to the Events
- * prototype to avoid using underscore for that sole purpose:
- *
- *     var myEventEmitter = BackboneEvents.mixin({});
- *
- * Or for a function constructor:
- *
- *     function MyConstructor(){}
- *     MyConstructor.prototype.foo = function(){}
- *     BackboneEvents.mixin(MyConstructor.prototype);
- *
- * (c) 2009-2013 Jeremy Ashkenas, DocumentCloud Inc.
- * (c) 2013 Nicolas Perriault
- */
-/* global exports:true, define, module */
-(function() {
-  var root = this,
-      breaker = {},
-      nativeForEach = Array.prototype.forEach,
-      hasOwnProperty = Object.prototype.hasOwnProperty,
-      slice = Array.prototype.slice,
-      idCounter = 0;
-
-  // Returns a partial implementation matching the minimal API subset required
-  // by Backbone.Events
-  function miniscore() {
-    return {
-      keys: Object.keys || function (obj) {
-        if (typeof obj !== "object" && typeof obj !== "function" || obj === null) {
-          throw new TypeError("keys() called on a non-object");
-        }
-        var key, keys = [];
-        for (key in obj) {
-          if (obj.hasOwnProperty(key)) {
-            keys[keys.length] = key;
-          }
-        }
-        return keys;
-      },
-
-      uniqueId: function(prefix) {
-        var id = ++idCounter + '';
-        return prefix ? prefix + id : id;
-      },
-
-      has: function(obj, key) {
-        return hasOwnProperty.call(obj, key);
-      },
-
-      each: function(obj, iterator, context) {
-        if (obj == null) return;
-        if (nativeForEach && obj.forEach === nativeForEach) {
-          obj.forEach(iterator, context);
-        } else if (obj.length === +obj.length) {
-          for (var i = 0, l = obj.length; i < l; i++) {
-            if (iterator.call(context, obj[i], i, obj) === breaker) return;
-          }
-        } else {
-          for (var key in obj) {
-            if (this.has(obj, key)) {
-              if (iterator.call(context, obj[key], key, obj) === breaker) return;
-            }
-          }
-        }
-      },
-
-      once: function(func) {
-        var ran = false, memo;
-        return function() {
-          if (ran) return memo;
-          ran = true;
-          memo = func.apply(this, arguments);
-          func = null;
-          return memo;
-        };
-      }
-    };
-  }
-
-  var _ = miniscore(), Events;
-
-  // Backbone.Events
-  // ---------------
-
-  // A module that can be mixed in to *any object* in order to provide it with
-  // custom events. You may bind with `on` or remove with `off` callback
-  // functions to an event; `trigger`-ing an event fires all callbacks in
-  // succession.
-  //
-  //     var object = {};
-  //     _.extend(object, Backbone.Events);
-  //     object.on('expand', function(){ alert('expanded'); });
-  //     object.trigger('expand');
-  //
-  Events = {
-
-    // Bind an event to a `callback` function. Passing `"all"` will bind
-    // the callback to all events fired.
-    on: function(name, callback, context) {
-      if (!eventsApi(this, 'on', name, [callback, context]) || !callback) return this;
-      this._events || (this._events = {});
-      var events = this._events[name] || (this._events[name] = []);
-      events.push({callback: callback, context: context, ctx: context || this});
-      return this;
-    },
-
-    // Bind an event to only be triggered a single time. After the first time
-    // the callback is invoked, it will be removed.
-    once: function(name, callback, context) {
-      if (!eventsApi(this, 'once', name, [callback, context]) || !callback) return this;
-      var self = this;
-      var once = _.once(function() {
-        self.off(name, once);
-        callback.apply(this, arguments);
-      });
-      once._callback = callback;
-      return this.on(name, once, context);
-    },
-
-    // Remove one or many callbacks. If `context` is null, removes all
-    // callbacks with that function. If `callback` is null, removes all
-    // callbacks for the event. If `name` is null, removes all bound
-    // callbacks for all events.
-    off: function(name, callback, context) {
-      var retain, ev, events, names, i, l, j, k;
-      if (!this._events || !eventsApi(this, 'off', name, [callback, context])) return this;
-      if (!name && !callback && !context) {
-        this._events = {};
-        return this;
-      }
-
-      names = name ? [name] : _.keys(this._events);
-      for (i = 0, l = names.length; i < l; i++) {
-        name = names[i];
-        if (events = this._events[name]) {
-          this._events[name] = retain = [];
-          if (callback || context) {
-            for (j = 0, k = events.length; j < k; j++) {
-              ev = events[j];
-              if ((callback && callback !== ev.callback && callback !== ev.callback._callback) ||
-                  (context && context !== ev.context)) {
-                retain.push(ev);
-              }
-            }
-          }
-          if (!retain.length) delete this._events[name];
-        }
-      }
-
-      return this;
-    },
-
-    // Trigger one or many events, firing all bound callbacks. Callbacks are
-    // passed the same arguments as `trigger` is, apart from the event name
-    // (unless you're listening on `"all"`, which will cause your callback to
-    // receive the true name of the event as the first argument).
-    trigger: function(name) {
-      if (!this._events) return this;
-      var args = slice.call(arguments, 1);
-      if (!eventsApi(this, 'trigger', name, args)) return this;
-      var events = this._events[name];
-      var allEvents = this._events.all;
-      if (events) triggerEvents(events, args);
-      if (allEvents) triggerEvents(allEvents, arguments);
-      return this;
-    },
-
-    // Tell this object to stop listening to either specific events ... or
-    // to every object it's currently listening to.
-    stopListening: function(obj, name, callback) {
-      var listeners = this._listeners;
-      if (!listeners) return this;
-      var deleteListener = !name && !callback;
-      if (typeof name === 'object') callback = this;
-      if (obj) (listeners = {})[obj._listenerId] = obj;
-      for (var id in listeners) {
-        listeners[id].off(name, callback, this);
-        if (deleteListener) delete this._listeners[id];
-      }
-      return this;
-    }
-
-  };
-
-  // Regular expression used to split event strings.
-  var eventSplitter = /\s+/;
-
-  // Implement fancy features of the Events API such as multiple event
-  // names `"change blur"` and jQuery-style event maps `{change: action}`
-  // in terms of the existing API.
-  var eventsApi = function(obj, action, name, rest) {
-    if (!name) return true;
-
-    // Handle event maps.
-    if (typeof name === 'object') {
-      for (var key in name) {
-        obj[action].apply(obj, [key, name[key]].concat(rest));
-      }
-      return false;
-    }
-
-    // Handle space separated event names.
-    if (eventSplitter.test(name)) {
-      var names = name.split(eventSplitter);
-      for (var i = 0, l = names.length; i < l; i++) {
-        obj[action].apply(obj, [names[i]].concat(rest));
-      }
-      return false;
-    }
-
-    return true;
-  };
-
-  // A difficult-to-believe, but optimized internal dispatch function for
-  // triggering events. Tries to keep the usual cases speedy (most internal
-  // Backbone events have 3 arguments).
-  var triggerEvents = function(events, args) {
-    var ev, i = -1, l = events.length, a1 = args[0], a2 = args[1], a3 = args[2];
-    switch (args.length) {
-      case 0: while (++i < l) (ev = events[i]).callback.call(ev.ctx); return;
-      case 1: while (++i < l) (ev = events[i]).callback.call(ev.ctx, a1); return;
-      case 2: while (++i < l) (ev = events[i]).callback.call(ev.ctx, a1, a2); return;
-      case 3: while (++i < l) (ev = events[i]).callback.call(ev.ctx, a1, a2, a3); return;
-      default: while (++i < l) (ev = events[i]).callback.apply(ev.ctx, args);
-    }
-  };
-
-  var listenMethods = {listenTo: 'on', listenToOnce: 'once'};
-
-  // Inversion-of-control versions of `on` and `once`. Tell *this* object to
-  // listen to an event in another object ... keeping track of what it's
-  // listening to.
-  _.each(listenMethods, function(implementation, method) {
-    Events[method] = function(obj, name, callback) {
-      var listeners = this._listeners || (this._listeners = {});
-      var id = obj._listenerId || (obj._listenerId = _.uniqueId('l'));
-      listeners[id] = obj;
-      if (typeof name === 'object') callback = this;
-      obj[implementation](name, callback, this);
-      return this;
-    };
-  });
-
-  // Aliases for backwards compatibility.
-  Events.bind   = Events.on;
-  Events.unbind = Events.off;
-
-  // Mixin utility
-  Events.mixin = function(proto) {
-    var exports = ['on', 'once', 'off', 'trigger', 'stopListening', 'listenTo',
-                   'listenToOnce', 'bind', 'unbind'];
-    _.each(exports, function(name) {
-      proto[name] = this[name];
-    }, this);
-    return proto;
-  };
-
-  // Export Events as BackboneEvents depending on current context
-  if (typeof define === "function") {
-    define(function() {
-      return Events;
-    });
-  } else if (typeof exports !== 'undefined') {
-    if (typeof module !== 'undefined' && module.exports) {
-      exports = module.exports = Events;
-    }
-    exports.BackboneEvents = Events;
-  } else {
-    root.BackboneEvents = Events;
-  }
-})(this);
-
-},{}],"/home/bbales2/modelEditor/node_modules/ampersand-view/node_modules/ampersand-collection-view/node_modules/backbone-events-standalone/index.js":[function(require,module,exports){
-module.exports=require("/home/bbales2/modelEditor/node_modules/ampersand-collection/node_modules/backbone-events-standalone/index.js")
-},{"/home/bbales2/modelEditor/node_modules/ampersand-collection/node_modules/backbone-events-standalone/index.js":"/home/bbales2/modelEditor/node_modules/ampersand-collection/node_modules/backbone-events-standalone/index.js"}],"/home/bbales2/modelEditor/node_modules/ampersand-view/node_modules/ampersand-dom-bindings/ampersand-dom-bindings.js":[function(require,module,exports){
+},{"ampersand-class-extend":"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/ampersand-view/node_modules/ampersand-collection-view/node_modules/ampersand-class-extend/ampersand-class-extend.js","backbone-events-standalone":"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/ampersand-view/node_modules/ampersand-collection-view/node_modules/backbone-events-standalone/index.js","underscore":"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/ampersand-view/node_modules/ampersand-collection-view/node_modules/underscore/underscore.js"}],"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/ampersand-view/node_modules/ampersand-collection-view/node_modules/ampersand-class-extend/ampersand-class-extend.js":[function(require,module,exports){
+module.exports=require("/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/ampersand-collection/node_modules/ampersand-class-extend/ampersand-class-extend.js")
+},{"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/ampersand-collection/node_modules/ampersand-class-extend/ampersand-class-extend.js":"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/ampersand-collection/node_modules/ampersand-class-extend/ampersand-class-extend.js"}],"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/ampersand-view/node_modules/ampersand-collection-view/node_modules/backbone-events-standalone/index.js":[function(require,module,exports){
+module.exports=require("/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/ampersand-state/node_modules/backbone-events-standalone/index.js")
+},{"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/ampersand-state/node_modules/backbone-events-standalone/index.js":"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/ampersand-state/node_modules/backbone-events-standalone/index.js"}],"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/ampersand-view/node_modules/ampersand-collection-view/node_modules/underscore/underscore.js":[function(require,module,exports){
+module.exports=require("/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/ampersand-model/node_modules/ampersand-sync/node_modules/underscore/underscore.js")
+},{"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/ampersand-model/node_modules/ampersand-sync/node_modules/underscore/underscore.js":"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/ampersand-model/node_modules/ampersand-sync/node_modules/underscore/underscore.js"}],"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/ampersand-view/node_modules/ampersand-dom-bindings/ampersand-dom-bindings.js":[function(require,module,exports){
 ;if (typeof window !== "undefined") {  window.ampersand = window.ampersand || {};  window.ampersand["ampersand-dom-bindings"] = window.ampersand["ampersand-dom-bindings"] || [];  window.ampersand["ampersand-dom-bindings"].push("3.3.3");}
 var Store = require('key-tree-store');
 var dom = require('ampersand-dom');
@@ -7758,7 +7509,7 @@ function getBindingFunc(binding, context) {
     }
 }
 
-},{"ampersand-dom":"/home/bbales2/modelEditor/node_modules/ampersand-dom/ampersand-dom.js","key-tree-store":"/home/bbales2/modelEditor/node_modules/ampersand-view/node_modules/ampersand-dom-bindings/node_modules/key-tree-store/key-tree-store.js","matches-selector":"/home/bbales2/modelEditor/node_modules/ampersand-view/node_modules/matches-selector/index.js"}],"/home/bbales2/modelEditor/node_modules/ampersand-view/node_modules/ampersand-dom-bindings/node_modules/key-tree-store/key-tree-store.js":[function(require,module,exports){
+},{"ampersand-dom":"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/ampersand-dom/ampersand-dom.js","key-tree-store":"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/ampersand-view/node_modules/ampersand-dom-bindings/node_modules/key-tree-store/key-tree-store.js","matches-selector":"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/ampersand-view/node_modules/matches-selector/index.js"}],"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/ampersand-view/node_modules/ampersand-dom-bindings/node_modules/key-tree-store/key-tree-store.js":[function(require,module,exports){
 var slice = Array.prototype.slice;
 
 // our constructor
@@ -7840,7 +7591,7 @@ KeyTreeStore.prototype.run = function (keypath, context) {
 
 module.exports = KeyTreeStore;
 
-},{}],"/home/bbales2/modelEditor/node_modules/ampersand-view/node_modules/events-mixin/index.js":[function(require,module,exports){
+},{}],"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/ampersand-view/node_modules/events-mixin/index.js":[function(require,module,exports){
 
 /**
  * Module dependencies.
@@ -8020,7 +7771,7 @@ function parse(event) {
   }
 }
 
-},{"component-event":"/home/bbales2/modelEditor/node_modules/ampersand-view/node_modules/events-mixin/node_modules/component-event/index.js","delegate-events":"/home/bbales2/modelEditor/node_modules/ampersand-view/node_modules/events-mixin/node_modules/delegate-events/index.js"}],"/home/bbales2/modelEditor/node_modules/ampersand-view/node_modules/events-mixin/node_modules/component-event/index.js":[function(require,module,exports){
+},{"component-event":"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/ampersand-view/node_modules/events-mixin/node_modules/component-event/index.js","delegate-events":"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/ampersand-view/node_modules/events-mixin/node_modules/delegate-events/index.js"}],"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/ampersand-view/node_modules/events-mixin/node_modules/component-event/index.js":[function(require,module,exports){
 var bind = window.addEventListener ? 'addEventListener' : 'attachEvent',
     unbind = window.removeEventListener ? 'removeEventListener' : 'detachEvent',
     prefix = bind !== 'addEventListener' ? 'on' : '';
@@ -8056,7 +7807,7 @@ exports.unbind = function(el, type, fn, capture){
   el[unbind](prefix + type, fn, capture || false);
   return fn;
 };
-},{}],"/home/bbales2/modelEditor/node_modules/ampersand-view/node_modules/events-mixin/node_modules/delegate-events/index.js":[function(require,module,exports){
+},{}],"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/ampersand-view/node_modules/events-mixin/node_modules/delegate-events/index.js":[function(require,module,exports){
 /**
  * Module dependencies.
  */
@@ -8108,7 +7859,7 @@ exports.unbind = function(el, type, fn, capture){
   event.unbind(el, type, fn, capture);
 };
 
-},{"closest":"/home/bbales2/modelEditor/node_modules/ampersand-view/node_modules/events-mixin/node_modules/delegate-events/node_modules/closest/index.js","event":"/home/bbales2/modelEditor/node_modules/ampersand-view/node_modules/events-mixin/node_modules/component-event/index.js"}],"/home/bbales2/modelEditor/node_modules/ampersand-view/node_modules/events-mixin/node_modules/delegate-events/node_modules/closest/index.js":[function(require,module,exports){
+},{"closest":"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/ampersand-view/node_modules/events-mixin/node_modules/delegate-events/node_modules/closest/index.js","event":"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/ampersand-view/node_modules/events-mixin/node_modules/component-event/index.js"}],"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/ampersand-view/node_modules/events-mixin/node_modules/delegate-events/node_modules/closest/index.js":[function(require,module,exports){
 var matches = require('matches-selector')
 
 module.exports = function (element, selector, checkYoSelf) {
@@ -8120,7 +7871,7 @@ module.exports = function (element, selector, checkYoSelf) {
   }
 }
 
-},{"matches-selector":"/home/bbales2/modelEditor/node_modules/ampersand-view/node_modules/events-mixin/node_modules/delegate-events/node_modules/closest/node_modules/matches-selector/index.js"}],"/home/bbales2/modelEditor/node_modules/ampersand-view/node_modules/events-mixin/node_modules/delegate-events/node_modules/closest/node_modules/matches-selector/index.js":[function(require,module,exports){
+},{"matches-selector":"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/ampersand-view/node_modules/events-mixin/node_modules/delegate-events/node_modules/closest/node_modules/matches-selector/index.js"}],"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/ampersand-view/node_modules/events-mixin/node_modules/delegate-events/node_modules/closest/node_modules/matches-selector/index.js":[function(require,module,exports){
 
 /**
  * Element prototype.
@@ -8161,7 +7912,7 @@ function match(el, selector) {
   }
   return false;
 }
-},{}],"/home/bbales2/modelEditor/node_modules/ampersand-view/node_modules/get-object-path/index.js":[function(require,module,exports){
+},{}],"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/ampersand-view/node_modules/get-object-path/index.js":[function(require,module,exports){
 module.exports = get;
 
 function get (context, path) {
@@ -8184,11 +7935,11 @@ function get (context, path) {
   return result;
 }
 
-},{}],"/home/bbales2/modelEditor/node_modules/ampersand-view/node_modules/matches-selector/index.js":[function(require,module,exports){
-module.exports=require("/home/bbales2/modelEditor/node_modules/ampersand-select-view/node_modules/matches-selector/index.js")
-},{"/home/bbales2/modelEditor/node_modules/ampersand-select-view/node_modules/matches-selector/index.js":"/home/bbales2/modelEditor/node_modules/ampersand-select-view/node_modules/matches-selector/index.js"}],"/home/bbales2/modelEditor/node_modules/ampersand-view/node_modules/underscore/underscore.js":[function(require,module,exports){
-module.exports=require("/home/bbales2/modelEditor/node_modules/ampersand-model/node_modules/ampersand-sync/node_modules/underscore/underscore.js")
-},{"/home/bbales2/modelEditor/node_modules/ampersand-model/node_modules/ampersand-sync/node_modules/underscore/underscore.js":"/home/bbales2/modelEditor/node_modules/ampersand-model/node_modules/ampersand-sync/node_modules/underscore/underscore.js"}],"/home/bbales2/modelEditor/node_modules/andlog/andlog.js":[function(require,module,exports){
+},{}],"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/ampersand-view/node_modules/matches-selector/index.js":[function(require,module,exports){
+module.exports=require("/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/ampersand-select-view/node_modules/matches-selector/index.js")
+},{"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/ampersand-select-view/node_modules/matches-selector/index.js":"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/ampersand-select-view/node_modules/matches-selector/index.js"}],"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/ampersand-view/node_modules/underscore/underscore.js":[function(require,module,exports){
+module.exports=require("/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/ampersand-view/node_modules/ampersand-collection-view/node_modules/underscore/underscore.js")
+},{"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/ampersand-view/node_modules/ampersand-collection-view/node_modules/underscore/underscore.js":"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/ampersand-view/node_modules/ampersand-collection-view/node_modules/underscore/underscore.js"}],"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/andlog/andlog.js":[function(require,module,exports){
 // follow @HenrikJoreteg and @andyet if you like this ;)
 (function () {
     var inNode = typeof window === 'undefined',
@@ -8219,7 +7970,7 @@ module.exports=require("/home/bbales2/modelEditor/node_modules/ampersand-model/n
     }
 })();
 
-},{}],"/home/bbales2/modelEditor/node_modules/clientconfig/clientconfig.js":[function(require,module,exports){
+},{}],"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/clientconfig/clientconfig.js":[function(require,module,exports){
 var cookies = require('cookie-getter'),
     config = cookies('config') || {};
 
@@ -8234,7 +7985,7 @@ document.cookie = 'config=;expires=Thu, 01 Jan 1970 00:00:00 GMT';
 // export it
 module.exports = config;
 
-},{"cookie-getter":"/home/bbales2/modelEditor/node_modules/clientconfig/node_modules/cookie-getter/cookie-getter.js"}],"/home/bbales2/modelEditor/node_modules/clientconfig/node_modules/cookie-getter/cookie-getter.js":[function(require,module,exports){
+},{"cookie-getter":"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/clientconfig/node_modules/cookie-getter/cookie-getter.js"}],"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/clientconfig/node_modules/cookie-getter/cookie-getter.js":[function(require,module,exports){
 // simple commonJS cookie reader, best perf according to http://jsperf.com/cookie-parsing
 module.exports = function (name) {
     var cookie = document.cookie,
@@ -8246,7 +7997,7 @@ module.exports = function (name) {
     return (res.charAt(0) === '{') ? JSON.parse(res) : res;
 };
 
-},{}],"/home/bbales2/modelEditor/node_modules/domify/index.js":[function(require,module,exports){
+},{}],"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/domify/index.js":[function(require,module,exports){
 
 /**
  * Expose `parse`.
@@ -8355,7 +8106,7 @@ function parse(html, doc) {
   return fragment;
 }
 
-},{}],"/home/bbales2/modelEditor/node_modules/domready/ready.js":[function(require,module,exports){
+},{}],"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/domready/ready.js":[function(require,module,exports){
 /*!
   * domready (c) Dustin Diaz 2014 - License MIT
   */
@@ -8387,7 +8138,7 @@ function parse(html, doc) {
 
 });
 
-},{}],"/home/bbales2/modelEditor/node_modules/jquery/dist/jquery.js":[function(require,module,exports){
+},{}],"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/jquery/dist/jquery.js":[function(require,module,exports){
 /*!
  * jQuery JavaScript Library v2.1.3
  * http://jquery.com/
@@ -17594,7 +17345,7 @@ return jQuery;
 
 }));
 
-},{}],"/home/bbales2/modelEditor/node_modules/katex/katex.js":[function(require,module,exports){
+},{}],"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/katex/katex.js":[function(require,module,exports){
 /**
  * This is the main entry point for KaTeX. Here, we expose functions for
  * rendering expressions either to DOM nodes or to markup strings.
@@ -17650,7 +17401,7 @@ module.exports = {
     ParseError: ParseError
 };
 
-},{"./src/ParseError":"/home/bbales2/modelEditor/node_modules/katex/src/ParseError.js","./src/buildTree":"/home/bbales2/modelEditor/node_modules/katex/src/buildTree.js","./src/parseTree":"/home/bbales2/modelEditor/node_modules/katex/src/parseTree.js","./src/utils":"/home/bbales2/modelEditor/node_modules/katex/src/utils.js"}],"/home/bbales2/modelEditor/node_modules/katex/src/Lexer.js":[function(require,module,exports){
+},{"./src/ParseError":"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/katex/src/ParseError.js","./src/buildTree":"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/katex/src/buildTree.js","./src/parseTree":"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/katex/src/parseTree.js","./src/utils":"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/katex/src/utils.js"}],"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/katex/src/Lexer.js":[function(require,module,exports){
 /**
  * The Lexer class handles tokenizing the input in various ways. Since our
  * parser expects us to be able to backtrack, the lexer allows lexing from any
@@ -17842,7 +17593,7 @@ Lexer.prototype.lex = function(pos, mode) {
 
 module.exports = Lexer;
 
-},{"./ParseError":"/home/bbales2/modelEditor/node_modules/katex/src/ParseError.js"}],"/home/bbales2/modelEditor/node_modules/katex/src/Options.js":[function(require,module,exports){
+},{"./ParseError":"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/katex/src/ParseError.js"}],"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/katex/src/Options.js":[function(require,module,exports){
 /**
  * This file contains information about the options that the Parser carries
  * around with it while parsing. Data is held in an `Options` object, and when
@@ -17929,7 +17680,7 @@ Options.prototype.getColor = function() {
 
 module.exports = Options;
 
-},{}],"/home/bbales2/modelEditor/node_modules/katex/src/ParseError.js":[function(require,module,exports){
+},{}],"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/katex/src/ParseError.js":[function(require,module,exports){
 /**
  * This is the ParseError class, which is the main error thrown by KaTeX
  * functions when something has gone wrong. This is used to distinguish internal
@@ -17971,7 +17722,7 @@ ParseError.prototype.__proto__ = Error.prototype;
 
 module.exports = ParseError;
 
-},{}],"/home/bbales2/modelEditor/node_modules/katex/src/Parser.js":[function(require,module,exports){
+},{}],"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/katex/src/Parser.js":[function(require,module,exports){
 var functions = require("./functions");
 var Lexer = require("./Lexer");
 var symbols = require("./symbols");
@@ -18612,7 +18363,7 @@ Parser.prototype.parseSymbol = function(pos, mode) {
 
 module.exports = Parser;
 
-},{"./Lexer":"/home/bbales2/modelEditor/node_modules/katex/src/Lexer.js","./ParseError":"/home/bbales2/modelEditor/node_modules/katex/src/ParseError.js","./functions":"/home/bbales2/modelEditor/node_modules/katex/src/functions.js","./symbols":"/home/bbales2/modelEditor/node_modules/katex/src/symbols.js","./utils":"/home/bbales2/modelEditor/node_modules/katex/src/utils.js"}],"/home/bbales2/modelEditor/node_modules/katex/src/Style.js":[function(require,module,exports){
+},{"./Lexer":"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/katex/src/Lexer.js","./ParseError":"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/katex/src/ParseError.js","./functions":"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/katex/src/functions.js","./symbols":"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/katex/src/symbols.js","./utils":"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/katex/src/utils.js"}],"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/katex/src/Style.js":[function(require,module,exports){
 /**
  * This file contains information and classes for the various kinds of styles
  * used in TeX. It provides a generic `Style` class, which holds information
@@ -18740,7 +18491,7 @@ module.exports = {
     SCRIPTSCRIPT: styles[SS]
 };
 
-},{}],"/home/bbales2/modelEditor/node_modules/katex/src/buildCommon.js":[function(require,module,exports){
+},{}],"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/katex/src/buildCommon.js":[function(require,module,exports){
 /**
  * This module contains general functions that can be used for building
  * different kinds of domTree nodes in a consistent manner.
@@ -19013,7 +18764,7 @@ module.exports = {
     makeVList: makeVList
 };
 
-},{"./domTree":"/home/bbales2/modelEditor/node_modules/katex/src/domTree.js","./fontMetrics":"/home/bbales2/modelEditor/node_modules/katex/src/fontMetrics.js","./symbols":"/home/bbales2/modelEditor/node_modules/katex/src/symbols.js"}],"/home/bbales2/modelEditor/node_modules/katex/src/buildTree.js":[function(require,module,exports){
+},{"./domTree":"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/katex/src/domTree.js","./fontMetrics":"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/katex/src/fontMetrics.js","./symbols":"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/katex/src/symbols.js"}],"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/katex/src/buildTree.js":[function(require,module,exports){
 /**
  * This file does the main work of building a domTree structure from a parse
  * tree. The entry point is the `buildTree` function, which takes a parse tree.
@@ -20182,7 +19933,7 @@ var buildTree = function(tree) {
 
 module.exports = buildTree;
 
-},{"./Options":"/home/bbales2/modelEditor/node_modules/katex/src/Options.js","./ParseError":"/home/bbales2/modelEditor/node_modules/katex/src/ParseError.js","./Style":"/home/bbales2/modelEditor/node_modules/katex/src/Style.js","./buildCommon":"/home/bbales2/modelEditor/node_modules/katex/src/buildCommon.js","./delimiter":"/home/bbales2/modelEditor/node_modules/katex/src/delimiter.js","./domTree":"/home/bbales2/modelEditor/node_modules/katex/src/domTree.js","./fontMetrics":"/home/bbales2/modelEditor/node_modules/katex/src/fontMetrics.js","./utils":"/home/bbales2/modelEditor/node_modules/katex/src/utils.js"}],"/home/bbales2/modelEditor/node_modules/katex/src/delimiter.js":[function(require,module,exports){
+},{"./Options":"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/katex/src/Options.js","./ParseError":"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/katex/src/ParseError.js","./Style":"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/katex/src/Style.js","./buildCommon":"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/katex/src/buildCommon.js","./delimiter":"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/katex/src/delimiter.js","./domTree":"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/katex/src/domTree.js","./fontMetrics":"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/katex/src/fontMetrics.js","./utils":"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/katex/src/utils.js"}],"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/katex/src/delimiter.js":[function(require,module,exports){
 /**
  * This file deals with creating delimiters of various sizes. The TeXbook
  * discusses these routines on page 441-442, in the "Another subroutine sets box
@@ -20725,7 +20476,7 @@ module.exports = {
     leftRightDelim: makeLeftRightDelim
 };
 
-},{"./ParseError":"/home/bbales2/modelEditor/node_modules/katex/src/ParseError.js","./Style":"/home/bbales2/modelEditor/node_modules/katex/src/Style.js","./buildCommon":"/home/bbales2/modelEditor/node_modules/katex/src/buildCommon.js","./fontMetrics":"/home/bbales2/modelEditor/node_modules/katex/src/fontMetrics.js","./symbols":"/home/bbales2/modelEditor/node_modules/katex/src/symbols.js","./utils":"/home/bbales2/modelEditor/node_modules/katex/src/utils.js"}],"/home/bbales2/modelEditor/node_modules/katex/src/domTree.js":[function(require,module,exports){
+},{"./ParseError":"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/katex/src/ParseError.js","./Style":"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/katex/src/Style.js","./buildCommon":"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/katex/src/buildCommon.js","./fontMetrics":"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/katex/src/fontMetrics.js","./symbols":"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/katex/src/symbols.js","./utils":"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/katex/src/utils.js"}],"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/katex/src/domTree.js":[function(require,module,exports){
 /**
  * These objects store the data about the DOM nodes we create, as well as some
  * extra data. They can then be transformed into real DOM nodes with the toNode
@@ -20968,7 +20719,7 @@ module.exports = {
     symbolNode: symbolNode
 };
 
-},{"./utils":"/home/bbales2/modelEditor/node_modules/katex/src/utils.js"}],"/home/bbales2/modelEditor/node_modules/katex/src/fontMetrics.js":[function(require,module,exports){
+},{"./utils":"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/katex/src/utils.js"}],"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/katex/src/fontMetrics.js":[function(require,module,exports){
 /* jshint unused:false */
 
 var Style = require("./Style");
@@ -21099,7 +20850,7 @@ module.exports = {
     getCharacterMetrics: getCharacterMetrics
 };
 
-},{"./Style":"/home/bbales2/modelEditor/node_modules/katex/src/Style.js"}],"/home/bbales2/modelEditor/node_modules/katex/src/functions.js":[function(require,module,exports){
+},{"./Style":"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/katex/src/Style.js"}],"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/katex/src/functions.js":[function(require,module,exports){
 var utils = require("./utils");
 var ParseError = require("./ParseError");
 
@@ -21640,7 +21391,7 @@ module.exports = {
     getGreediness: getGreediness
 };
 
-},{"./ParseError":"/home/bbales2/modelEditor/node_modules/katex/src/ParseError.js","./utils":"/home/bbales2/modelEditor/node_modules/katex/src/utils.js"}],"/home/bbales2/modelEditor/node_modules/katex/src/parseTree.js":[function(require,module,exports){
+},{"./ParseError":"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/katex/src/ParseError.js","./utils":"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/katex/src/utils.js"}],"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/katex/src/parseTree.js":[function(require,module,exports){
 /**
  * Provides a single function for parsing an expression using a Parser
  * TODO(emily): Remove this
@@ -21659,7 +21410,7 @@ var parseTree = function(toParse) {
 
 module.exports = parseTree;
 
-},{"./Parser":"/home/bbales2/modelEditor/node_modules/katex/src/Parser.js"}],"/home/bbales2/modelEditor/node_modules/katex/src/symbols.js":[function(require,module,exports){
+},{"./Parser":"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/katex/src/Parser.js"}],"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/katex/src/symbols.js":[function(require,module,exports){
 /**
  * This file holds a list of all no-argument functions and single-character
  * symbols (like 'a' or ';').
@@ -22667,7 +22418,7 @@ for (var i = 0; i < letters.length; i++) {
 
 module.exports = symbols;
 
-},{}],"/home/bbales2/modelEditor/node_modules/katex/src/utils.js":[function(require,module,exports){
+},{}],"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/katex/src/utils.js":[function(require,module,exports){
 /**
  * This file contains a list of utility functions which are useful in other
  * files.
@@ -22766,7 +22517,7 @@ module.exports = {
     clearNode: clearNode
 };
 
-},{}],"/home/bbales2/modelEditor/node_modules/underscore/underscore.js":[function(require,module,exports){
+},{}],"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/underscore/underscore.js":[function(require,module,exports){
 //     Underscore.js 1.7.0
 //     http://underscorejs.org
 //     (c) 2009-2014 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
@@ -24183,7 +23934,7 @@ module.exports = {
   }
 }.call(this));
 
-},{}],"/home/bbales2/modelEditor/node_modules/watchify/node_modules/browserify/node_modules/buffer/index.js":[function(require,module,exports){
+},{}],"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/watchify/node_modules/browserify/node_modules/buffer/index.js":[function(require,module,exports){
 /*!
  * The buffer module from node.js, for the browser.
  *
@@ -25501,7 +25252,7 @@ function decodeUtf8Char (str) {
   }
 }
 
-},{"base64-js":"/home/bbales2/modelEditor/node_modules/watchify/node_modules/browserify/node_modules/buffer/node_modules/base64-js/lib/b64.js","ieee754":"/home/bbales2/modelEditor/node_modules/watchify/node_modules/browserify/node_modules/buffer/node_modules/ieee754/index.js","is-array":"/home/bbales2/modelEditor/node_modules/watchify/node_modules/browserify/node_modules/buffer/node_modules/is-array/index.js"}],"/home/bbales2/modelEditor/node_modules/watchify/node_modules/browserify/node_modules/buffer/node_modules/base64-js/lib/b64.js":[function(require,module,exports){
+},{"base64-js":"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/watchify/node_modules/browserify/node_modules/buffer/node_modules/base64-js/lib/b64.js","ieee754":"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/watchify/node_modules/browserify/node_modules/buffer/node_modules/ieee754/index.js","is-array":"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/watchify/node_modules/browserify/node_modules/buffer/node_modules/is-array/index.js"}],"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/watchify/node_modules/browserify/node_modules/buffer/node_modules/base64-js/lib/b64.js":[function(require,module,exports){
 var lookup = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';
 
 ;(function (exports) {
@@ -25627,7 +25378,7 @@ var lookup = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';
 	exports.fromByteArray = uint8ToBase64
 }(typeof exports === 'undefined' ? (this.base64js = {}) : exports))
 
-},{}],"/home/bbales2/modelEditor/node_modules/watchify/node_modules/browserify/node_modules/buffer/node_modules/ieee754/index.js":[function(require,module,exports){
+},{}],"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/watchify/node_modules/browserify/node_modules/buffer/node_modules/ieee754/index.js":[function(require,module,exports){
 exports.read = function(buffer, offset, isLE, mLen, nBytes) {
   var e, m,
       eLen = nBytes * 8 - mLen - 1,
@@ -25713,9 +25464,9 @@ exports.write = function(buffer, value, offset, isLE, mLen, nBytes) {
   buffer[offset + i - d] |= s * 128;
 };
 
-},{}],"/home/bbales2/modelEditor/node_modules/watchify/node_modules/browserify/node_modules/buffer/node_modules/is-array/index.js":[function(require,module,exports){
-module.exports=require("/home/bbales2/modelEditor/node_modules/ampersand-collection/node_modules/is-array/index.js")
-},{"/home/bbales2/modelEditor/node_modules/ampersand-collection/node_modules/is-array/index.js":"/home/bbales2/modelEditor/node_modules/ampersand-collection/node_modules/is-array/index.js"}],"/home/bbales2/modelEditor/select/model-collection.js":[function(require,module,exports){
+},{}],"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/watchify/node_modules/browserify/node_modules/buffer/node_modules/is-array/index.js":[function(require,module,exports){
+module.exports=require("/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/ampersand-collection/node_modules/is-array/index.js")
+},{"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/ampersand-collection/node_modules/is-array/index.js":"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/ampersand-collection/node_modules/is-array/index.js"}],"/home/bbales2/stochssModel/app/lib/modelEditor/select/model-collection.js":[function(require,module,exports){
 var _ = require('underscore');
 var $ = require('jquery');
 var AmpersandView = require('ampersand-view');
@@ -25733,7 +25484,7 @@ var AddNewModelForm = AmpersandFormView.extend({
                                 type : 'massaction',
                                 isSpatial : false });
 
-        this.collection.add(model);
+        this.collection.add(model).save();
     },
     validCallback: function (valid) {
         if (valid) {
@@ -25774,7 +25525,7 @@ var AddNewModelForm = AmpersandFormView.extend({
 });
 
 var ModelCollectionSelectView = AmpersandView.extend({
-    template: "<div><div>Model selector<div><table><thead><th>*</th><th>Name</th><th>Type</th><th>Delete</th></thead><tbody data-hook='modelTable'></tbody></table>Add Model: <form data-hook='addModelForm'></form></div>",
+    template: "<div><h3>Select Model</h3><table class='table table-bordered'><thead><th></th><th>Name</th><th>Type</th><th>Delete</th></thead><tbody data-hook='modelTable'></tbody></table><h3>Add Model</h3><form data-hook='addModelForm'></form></div>",
     props: {
         selected : 'object'
     },
@@ -25820,7 +25571,7 @@ var ModelCollectionSelectView = AmpersandView.extend({
 
 module.exports = ModelCollectionSelectView
 
-},{"../forms/tests.js":"/home/bbales2/modelEditor/forms/tests.js","../models/model":"/home/bbales2/modelEditor/models/model.js","./model":"/home/bbales2/modelEditor/select/model.js","ampersand-form-view":"/home/bbales2/modelEditor/node_modules/ampersand-form-view/ampersand-form-view.js","ampersand-input-view":"/home/bbales2/modelEditor/node_modules/ampersand-input-view/ampersand-input-view.js","ampersand-select-view":"/home/bbales2/modelEditor/node_modules/ampersand-select-view/ampersand-select-view.js","ampersand-view":"/home/bbales2/modelEditor/node_modules/ampersand-view/ampersand-view.js","jquery":"/home/bbales2/modelEditor/node_modules/jquery/dist/jquery.js","underscore":"/home/bbales2/modelEditor/node_modules/underscore/underscore.js"}],"/home/bbales2/modelEditor/select/model.js":[function(require,module,exports){
+},{"../forms/tests.js":"/home/bbales2/stochssModel/app/lib/modelEditor/forms/tests.js","../models/model":"/home/bbales2/stochssModel/app/lib/modelEditor/models/model.js","./model":"/home/bbales2/stochssModel/app/lib/modelEditor/select/model.js","ampersand-form-view":"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/ampersand-form-view/ampersand-form-view.js","ampersand-input-view":"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/ampersand-input-view/ampersand-input-view.js","ampersand-select-view":"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/ampersand-select-view/ampersand-select-view.js","ampersand-view":"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/ampersand-view/ampersand-view.js","jquery":"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/jquery/dist/jquery.js","underscore":"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/underscore/underscore.js"}],"/home/bbales2/stochssModel/app/lib/modelEditor/select/model.js":[function(require,module,exports){
 var _ = require('underscore');
 var $ = require('jquery');
 var View = require('ampersand-view');
@@ -25854,12 +25605,18 @@ module.exports = View.extend({
         }
     },
     events: {
-        "click input" : "selectSelf"
+        "click input" : "selectSelf",
+        "click button" : "removeModel"
     },
     selectSelf: function()
     {
         // There is a CollectionView parent here that must be navigated
         this.parent.parent.selectModel(this.model);
+    },
+    removeModel: function()
+    {
+        //this.model.collection.remove(this.model);
+        this.model.destroy();
     },
     render: function()
     {
@@ -25871,4 +25628,4 @@ module.exports = View.extend({
     }
 });
 
-},{"ampersand-view":"/home/bbales2/modelEditor/node_modules/ampersand-view/ampersand-view.js","jquery":"/home/bbales2/modelEditor/node_modules/jquery/dist/jquery.js","underscore":"/home/bbales2/modelEditor/node_modules/underscore/underscore.js"}]},{},["/home/bbales2/modelEditor/app.js"]);
+},{"ampersand-view":"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/ampersand-view/ampersand-view.js","jquery":"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/jquery/dist/jquery.js","underscore":"/home/bbales2/stochssModel/app/lib/modelEditor/node_modules/underscore/underscore.js"}]},{},["/home/bbales2/stochssModel/app/lib/modelEditor/app.js"]);

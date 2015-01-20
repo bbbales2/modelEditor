@@ -92,7 +92,7 @@ var AddNewReactionForm = AmpersandFormView.extend({
 });
 
 var ReactionCollectionFormView = AmpersandView.extend({
-    template: "<div><div>Reactions editor<div><table border='1' data-hook='reactionTable'></table>Add Reaction: <form data-hook='addReactionForm'></form></div>",
+    template: "<div><h4>Reactions editor</h4><table><thead><th><button style='visibility:hidden'>x</button></th><th width='218px'>Name</th><th width='218px'>Parameter</th><th width='218px'>Rate</th></thead></table><div data-hook='reactionTable'></div><h4>Add Reaction</h4><form data-hook='addReactionForm'></form></div>",
     initialize: function(attr, options)
     {
         AmpersandView.prototype.initialize.call(this, attr, options);

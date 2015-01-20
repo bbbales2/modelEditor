@@ -31,7 +31,7 @@ var AddNewParameterForm = AmpersandFormView.extend({
                 label: 'Name',
                 name: 'name',
                 value: '',
-                required: false,
+                required: true,
                 placeholder: 'NewParameters',
                 tests: [].concat(Tests.naming(this.collection))
             }),
@@ -39,7 +39,7 @@ var AddNewParameterForm = AmpersandFormView.extend({
                 label: 'Value',
                 name: 'value',
                 value: '0',
-                required: false,
+                required: true,
                 placeholder: '0',
                 tests: []
             })
@@ -57,7 +57,7 @@ var AddNewParameterForm = AmpersandFormView.extend({
 });
 
 var ParameterCollectionFormView = AmpersandView.extend({
-    template: "<div><div>Parameters editor<div><table data-hook='parametersTable'></table>Add Parameter: <form data-hook='addParametersForm'></form></div>",
+    template: "<div><h4>Parameters editor</h4><table class='table table-bordered'><thead><th></th><th>Name</th><th>Value</th></thead><tbody data-hook='parametersTable'></tbody></table>Add Parameter: <form data-hook='addParametersForm'></form></div>",
     initialize: function(attr, options)
     {
         AmpersandView.prototype.initialize.call(this, attr, options);

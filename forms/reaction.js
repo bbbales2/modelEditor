@@ -10,7 +10,23 @@ var katex = require('katex')
 
 var Tests = require('./tests');
 module.exports = View.extend({
-    template: "<tr><button>x</button><td data-hook='name'></td><td data-hook='typeSelect'></td><td data-hook='parameter'></td><td data-hook='equation'></td><td data-hook='latex'></td><td data-hook='reactants'></td><td data-hook='products'></td></tr>",
+    template: "<div>\
+<div data-hook='basic'>\
+  <button data-hook='remove'>x</button>\
+  <span data-hook='name'></span> \
+  <span data-hook='typeSelect'></span> \
+  <span data-hook='parameter'></span> \
+  <span data-hook='equation'></span> \
+  <span data-hook='latex'></span> \
+  <button data-hook='edit'>Edit</button>\
+</div>\
+<table width='100%' data-hook='advanced'>\
+  <tr> \
+    <td><h4>Reactants</h4><div data-hook='reactants'></div></td>\
+    <td><h4>Products</h4><div data-hook='products'></div></td>\
+  </tr>\
+</table>\
+</div>",
     // Gotta have a few of these functions just so this works as a form view
     // This gets called when things update
     update: function(obj)
@@ -66,6 +82,14 @@ module.exports = View.extend({
     {
         this.model.collection.remove(this.model);        
     },
+    toggleEdit: function()
+    {
+        $( this.queryByHook('advanced') ).toggle();
+    },
+    events: {
+        "click [data-hook='remove']" : "removeModel",
+        "click [data-hook='edit']" : "toggleEdit"
+    },
     bindings: {
         'model.type' : {
             type: 'switch',
@@ -79,14 +103,17 @@ module.exports = View.extend({
     {
         View.prototype.render.apply(this, arguments);
 
+        $( this.queryByHook('advanced') ).hide();
+
         this.baseModel = this.model.collection.parent;
 
-        this.listenTo(this.model, 'change', this.redrawLatex);
-        this.listenTo(this.model.reactants, 'add remove change', this.redrawLatex);
-        this.listenToAndRun(this.model.products, 'add remove change', this.redrawLatex);
+        this.listenTo(this.model, 'change', _.bind(this.redrawLatex, this));
+        this.listenTo(this.model.reactants, 'add remove change', _.bind(this.redrawLatex, this));
+        this.listenToAndRun(this.model.products, 'add remove change', _.bind(this.redrawLatex, this));
 
         this.renderSubview(
             new ModifyingInputView({
+                template: '<span><span data-hook="label"></span><input><span data-hook="message-container"><span data-hook="message-text"></span></span></span>',
                 label: 'Name',
                 name: 'name',
                 value: this.model.name,
@@ -98,6 +125,7 @@ module.exports = View.extend({
 
         this.renderSubview(
             new SelectView({
+                template: '<span><span data-hook="label"></span><select></select><span data-hook="message-container"><span data-hook="message-text"></span></span></span>',
                 label: 'Type',
                 name: 'type',
                 value: this.model.type,
@@ -107,6 +135,7 @@ module.exports = View.extend({
 
         this.renderSubview(
             new SelectView({
+                template: '<span><span data-hook="label"></span><select></select><span data-hook="message-container"><span data-hook="message-text"></span></span></span>',
                 label: 'Parameter',
                 name: 'parameter',
                 value: this.model.rate,
@@ -119,6 +148,7 @@ module.exports = View.extend({
 
         this.renderSubview(
             new ModifyingInputView({
+                template: '<span><span data-hook="label"></span><input><span data-hook="message-container"><span data-hook="message-text"></span></span></span>',
                 label: 'Equation',
                 name: 'equation',
                 value: this.model.equation,
@@ -137,6 +167,9 @@ module.exports = View.extend({
             new StoichSpecieCollectionFormView({
                 collection: this.model.products
             }), this.el.querySelector("[data-hook='products']"));
+        
+        //Hide all the labels!
+        $( this.queryByHook('basic') ).find('[data-hook="label"]').hide();
         
         return this;
     }

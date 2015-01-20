@@ -32,6 +32,7 @@ module.exports = View.extend({
 
         this.renderSubview(
             new ModifyingInputView({
+                template: '<span><span data-hook="label"></span><input><span data-hook="message-container"><span data-hook="message-text"></span></span></span>',
                 label: 'Name',
                 name: 'name',
                 value: this.model.name,
@@ -43,6 +44,7 @@ module.exports = View.extend({
 
         this.renderSubview(
             new ModifyingInputView({
+                template: '<span><span data-hook="label"></span><input><span data-hook="message-container"><span data-hook="message-text"></span></span></span>',
                 label: 'Value',
                 name: 'value',
                 value: this.model.value,
@@ -52,6 +54,9 @@ module.exports = View.extend({
                 tests: []
             }), this.el.querySelector("[data-hook='value']"));
         
+        //Hide all the labels!
+        $( this.el ).find('[data-hook="label"]').hide();
+
         return this;
     }
 });

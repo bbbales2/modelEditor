@@ -38,36 +38,46 @@ model2.reactions.addMassActionReaction('R2', k2, [[B, 1], [A, 1]], [[B, 5]]);
 model = new Model(model2.toJSON());*/
 
 var PrimaryView = View.extend({
-    template: "<body> \
-<div data-hook='editor'></div> \
-<div data-hook='selector'></div> \
-</body>",
+    template: "<div> \
+<div class='well' data-hook='selector'></div> \
+<div class='well' data-hook='editor'></div> \
+</div>",
     initialize: function(attr, options)
     {
         View.prototype.initialize.call(this, attr, options);
     },
     selectModel: function()
     {
+        if(this.modelSelector.selected)
+        {
+            if(this.modelEditor)
+            {
+                this.modelEditor.remove()
+                this.stopListening(this.modelSelector.selected);
+                
+                delete this.modelEditor;
+            }
+            
+            this.modelEditor = new ModelEditorView( {
+                    el : $( '<div>' ).appendTo( this.queryByHook('editor') )[0],
+                    model : this.modelSelector.selected,
+                    parent : this
+                } )
+            
+            this.listenTo(this.modelSelector.selected, 'remove', _.bind(this.modelDeleted, this));
+            this.registerSubview(this.modelEditor);
+            this.modelEditor.render();
+        }
+    },
+    modelDeleted: function()
+    {
         if(this.modelEditor)
         {
             this.modelEditor.remove()
+            this.stopListening(this.modelSelector.selected);
             
             delete this.modelEditor;
         }
-
-        console.log(this.modelSelector.selected.name);
-
-        this.modelEditor = //this.renderSubview(
-            new ModelEditorView( {
-                el : $( '<div>' ).appendTo( this.queryByHook('editor') )[0],
-                model : this.modelSelector.selected,
-                parent : this
-            } )
-
-        this.registerSubview(this.modelEditor);
-        this.modelEditor.render();
-//, 
-  //      );
     },
     render: function()
     {

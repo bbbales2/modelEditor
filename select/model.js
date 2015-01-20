@@ -31,12 +31,18 @@ module.exports = View.extend({
         }
     },
     events: {
-        "click input" : "selectSelf"
+        "click input" : "selectSelf",
+        "click button" : "removeModel"
     },
     selectSelf: function()
     {
         // There is a CollectionView parent here that must be navigated
         this.parent.parent.selectModel(this.model);
+    },
+    removeModel: function()
+    {
+        //this.model.collection.remove(this.model);
+        this.model.destroy();
     },
     render: function()
     {

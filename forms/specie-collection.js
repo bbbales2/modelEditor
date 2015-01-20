@@ -31,7 +31,7 @@ var AddNewSpecieForm = AmpersandFormView.extend({
                 label: 'Name',
                 name: 'name',
                 value: '',
-                required: false,
+                required: true,
                 placeholder: 'NewSpecies',
                 tests: [].concat(Tests.naming(this.collection))
             }),
@@ -39,7 +39,7 @@ var AddNewSpecieForm = AmpersandFormView.extend({
                 label: 'Initial Condition',
                 name: 'initialCondition',
                 value: '0',
-                required: false,
+                required: true,
                 placeholder: '0',
                 tests: [].concat(Tests.nonzero(), Tests.units(this.collection.parent))
             })
@@ -69,7 +69,7 @@ var AddNewSpecieForm = AmpersandFormView.extend({
 new TestForm();*/
 
 var SpecieCollectionFormView = AmpersandView.extend({
-    template: "<div><div>Species editor<div><table data-hook='speciesTable'></table>Add Specie: <form data-hook='addSpeciesForm'></form></div>",
+    template: "<div><h4>Species editor</h4><table><thead><th></th><th>Name</th><th>Initial Condition</th></thead><tbody data-hook='speciesTable'></tbody></table>Add Specie: <form data-hook='addSpeciesForm'></form></div>",
     initialize: function(attr, options)
     {
         AmpersandView.prototype.initialize.call(this, attr, options);

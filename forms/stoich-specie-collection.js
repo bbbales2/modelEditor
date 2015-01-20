@@ -58,7 +58,7 @@ var AddNewStoichSpecieForm = AmpersandFormView.extend({
 });
 
 var StoichSpecieCollectionFormView = AmpersandView.extend({
-    template: "<div><div>Stoichiometry editor<div><table data-hook='stoichSpecieTable'></table>Add Stoichiometric Specie: <form data-hook='addStoichSpecieForm'></form></div>",
+    template: "<div><table data-hook='stoichSpecieTable'></table>Add Specie: <form data-hook='addStoichSpecieForm'></form></div>",
     initialize: function(attr, options)
     {
         AmpersandView.prototype.initialize.call(this, attr, options);
